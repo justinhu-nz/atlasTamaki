@@ -408,7 +408,7 @@ function renderSide() { cur ? renderIdea() : renderHome(); renderOverlays(); }
 function renderHome() {
   $("body").innerHTML = `
     <div class="guide"><b>Adding an idea</b><ol>
-      <li>Drop a picture onto the map where the idea would happen.</li>
+      <li>Drop a picture onto the map, or paste one with ⌘V / Ctrl+V at the map centre.</li>
       <li>Drag, resize and rotate it until it lines up with the streets.</li>
       <li>Give it a title and a short description.</li>
       <li>Press Save. Reload the public map to see it.</li></ol></div>
@@ -440,7 +440,7 @@ function renderIdea() {
 
     <section id="pictures"><h3>Pictures <small>the first one is the main picture</small></h3>
       <div id="imgs"></div>
-      <div class="dropzone">Drop a picture onto the map where it belongs,<br>or <button class="btn small" id="addImg">choose a file…</button></div>
+      <div class="dropzone">Drop a picture onto the map where it belongs,<br>paste with ⌘V / Ctrl+V, or <button class="btn small" id="addImg">choose a file…</button></div>
       <details class="group-pictures"><summary>Group existing pictures here</summary>
         <p class="hint">Choose pictures from another idea to move here. Their placements, captions and credits stay the same. The original idea and its text stay available.</p>
         <label>From idea<select id="groupFrom"><option value="">Choose an idea…</option>${IDEAS.filter(other => other !== i && other.images.length).sort((a, b) => label(a).localeCompare(label(b))).map(other => `<option value="${other._key}">${esc(label(other))} (${other.images.length})</option>`).join("")}</select></label>
@@ -664,6 +664,25 @@ function imageAction(act, img) {
 }
 
 // ---------- adding pictures ----------
+addEventListener("paste", e => {
+  const clipboard = e.clipboardData;
+  if (!clipboard) return;
+  let images = [...clipboard.files].filter(file => file.type.startsWith("image/"));
+  if (!images.length) images = [...clipboard.items]
+    .filter(item => item.kind === "file" && item.type.startsWith("image/"))
+    .map(item => item.getAsFile()).filter(Boolean);
+  if (!images.length) return; // Leave ordinary text and link pasting to the focused field.
+  e.preventDefault();
+  const batch = crypto.randomUUID().slice(0, 8);
+  const files = images.map((file, i) => {
+    const extension = file.name.match(/\.[a-z0-9]+$/i)?.[0]
+      || ({ "image/jpeg": ".jpg", "image/webp": ".webp", "image/gif": ".gif", "image/avif": ".avif" }[file.type] || ".png");
+    // Distinct names also prevent repeated clipboard screenshots replacing pending downloads.
+    return new File([file], `pasted-image-${batch}-${i + 1}${extension}`, { type: file.type });
+  });
+  addFiles(files).catch(error => status(`Couldn't paste picture: ${esc(error.message)}`, true));
+});
+
 let replaceTarget = null;
 function pickFile(target) { replaceTarget = target; $("file").multiple = !target; $("file").click(); }
 $("file").onchange = e => {

@@ -605,6 +605,30 @@ window.ATLAS = {
           "credit": ""
         }
       ]
+    },
+    {
+      "slug": "newmarket-north-concourse",
+      "title": "Newmarket north concourse",
+      "category": "rapid",
+      "description": "",
+      "images": [
+        {
+          "file": "images/pasted-image-6afa3c51-1.png",
+          "center": [174.779252, -36.868264],
+          "wm": 423,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        },
+        {
+          "file": "images/CleanShot-2026-10-28-at-00.34.21-2x.png",
+          "center": [174.778794, -36.868073],
+          "wm": 1417,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        }
+      ]
     }
   ]
 };
