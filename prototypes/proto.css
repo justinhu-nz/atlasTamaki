@@ -1,0 +1,6 @@
+html,body { margin:0; height:100%; font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif; color:#1d2228; background:#fff; }
+#map { position:absolute; inset:0; }
+.note { position:absolute; top:12px; left:12px; z-index:5; background:#fff; padding:10px 14px; border-radius:10px; box-shadow:0 1px 6px rgba(0,0,0,.2); max-width:340px; }
+.note label, .note nav, .note span { display:block; margin-top:6px; }
+.note nav { font-size:12px; color:#5f6b76; border-top:1px solid #e3e6ea; padding-top:6px; }
+.note a { color:#1c7ed6; }

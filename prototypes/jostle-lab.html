@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jostle lab</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="items.js"></script>
+<link rel="stylesheet" href="proto.css">
+<style>
+  #layer { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  #ties { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  #ties path { fill:none; stroke:#1d2228; stroke-width:1.3; opacity:.5; }
+  #ties .dot { fill:#1d2228; stroke:#fff; stroke-width:1.5; }
+  #ties .pin { fill:var(--c,#d6336c); stroke:#fff; stroke-width:1.5; }
+  #ties .bub { stroke:none; opacity:1; }
+
+  .st { position:absolute; left:0; top:0; pointer-events:auto; cursor:pointer; background:#fff; box-sizing:border-box;
+    padding:4px; border-radius:6px; box-shadow:0 3px 10px rgba(0,0,0,.28); }
+  .st img { width:100%; height:100%; object-fit:cover; display:block; border-radius:3px; pointer-events:none; }
+  .st:hover { z-index:60 !important; box-shadow:0 8px 22px rgba(0,0,0,.38); }
+  .st .lbl { position:absolute; left:50%; top:100%; transform:translate(-50%,5px); background:#fff; font-size:11px; font-weight:600;
+    padding:1px 7px; border-radius:4px; white-space:nowrap; box-shadow:0 1px 3px rgba(0,0,0,.2); pointer-events:none; }
+  .st .n { position:absolute; top:-9px; right:-9px; background:#1d2228; color:#fff; font-size:11px; font-weight:700; padding:1px 7px; border-radius:999px; }
+  /* Forms */
+  .st.polaroid { padding:5px 5px 22px; border-radius:2px; }
+  .st.polaroid img { border-radius:0; }
+  .st.polaroid .lbl { top:auto; bottom:3px; transform:translateX(-50%); box-shadow:none; background:none; max-width:92%; overflow:hidden; text-overflow:ellipsis; font-weight:500; }
+  .st.circle, .st.circle img { border-radius:50%; }
+  .st.bubble { border-radius:12px; }
+  .st.bubble img { border-radius:8px; }
+  .st.tint { border:3px solid var(--c); }
+  /* Collapsed pile: cards fanned behind the top one */
+  .st.pile { box-shadow:0 3px 10px rgba(0,0,0,.28), 6px -4px 0 -1px #fff, 6px -4px 2px 0 rgba(0,0,0,.18), 11px -8px 0 -2px #fff, 11px -8px 2px -1px rgba(0,0,0,.15); }
+
+  .note { max-height:calc(100vh - 40px); overflow:auto; }
+  .note fieldset { border:0; border-top:1px solid #e3e6ea; margin:6px 0 0; padding:6px 0 0; }
+  .note legend { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#5f6b76; padding:0; }
+  .note select { font:inherit; width:100%; }
+  .note small { color:#5f6b76; display:block; }
+  #presets button { font:inherit; font-size:12px; padding:3px 8px; margin:2px 2px 0 0; border:1px solid #ccd; background:#f6f7f9; border-radius:999px; cursor:pointer; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="layer"><svg id="ties"></svg></div>
+<div class="note">
+  <span><b>Jostle lab</b>: stickers are pulled to their spot and push each other apart. Mix the options below, or start from a preset.</span>
+  <div id="presets">
+    <button data-p="calm">Calm</button><button data-p="scrapbook">Scrapbook</button><button data-p="bubbles">Speech bubbles</button>
+    <button data-p="harbour">Harbour drift</button><button data-p="focus">Focus lens</button><button data-p="piles">Piles</button>
+  </div>
+  <fieldset><legend>Sticker</legend>
+    <label>Form <select id="form">
+      <option value="card">Card</option><option value="polaroid">Polaroid (title inside)</option>
+      <option value="circle">Circle</option><option value="bubble">Speech bubble (points to its spot)</option></select></label>
+    <label>Size <select id="sizing">
+      <option value="fixed">Same for all</option><option value="importance">By idea size</option>
+      <option value="focus" selected>Focus: hovered grows, others make room</option></select></label>
+    <label>Size <input id="S" type="range" min="44" max="150" value="84"></label>
+    <label><input id="labels" type="checkbox" checked> Titles</label>
+    <label><input id="tint" type="checkbox" checked> Colour edge by idea</label>
+    <label><input id="tilt" type="checkbox" checked> Tilt</label>
+  </fieldset>
+  <fieldset><legend>Link to its spot</legend>
+    <label>Line <select id="tether"><option value="line">Straight</option><option value="string">Hanging string</option><option value="none">None</option></select></label>
+    <label>Spot marker <select id="anchor"><option value="dot">Dot</option><option value="pin">Pin</option><option value="none">None</option></select></label>
+  </fieldset>
+  <fieldset><legend>Movement</legend>
+    <label>Pull to spot <input id="k" type="range" min="1" max="30" value="10"></label>
+    <label>Bounciness <input id="bounce" type="range" min="0" max="90" value="20"></label>
+    <label>Personal space <input id="gap" type="range" min="0" max="40" value="6"></label>
+    <label><input id="water" type="checkbox"> Drift towards water <small>stickers float off land into the harbour</small></label>
+    <label><input id="breathe" type="checkbox"> Idle drift <small>a slow float, so it feels alive</small></label>
+  </fieldset>
+  <fieldset><legend>When crowded</legend>
+    <label><select id="crowd"><option value="spread">Spread everything out</option><option value="pile">Pile up, open on hover</option></select></label>
+  </fieldset>
+  <nav><a href="jostle-lab.html">Jostle lab</a> · <a href="stickers.html">Sticker variations</a> · <a href="c-editor.html">Editor</a></nav>
+</div>
+<script>
+const map = newMap(), layer = document.getElementById("layer"), ties = document.getElementById("ties");
+const $ = id => document.getElementById(id);
+const IDS = ["form", "sizing", "S", "labels", "tint", "tilt", "tether", "anchor", "k", "bounce", "gap", "water", "breathe", "crowd"];
+const opt = {};
+let hovered = null, openPile = null, pileTimer = null, unfocusTimer = null, waterLayers = [], t0 = performance.now();
+
+const PRESETS = {
+  calm:      { form: "card", sizing: "fixed", tether: "line", anchor: "dot", k: 8, bounce: 0, gap: 6, water: false, breathe: false, crowd: "spread", tilt: false, tint: false, labels: true },
+  scrapbook: { form: "polaroid", sizing: "importance", tether: "string", anchor: "pin", k: 6, bounce: 40, gap: 2, water: false, breathe: false, crowd: "spread", tilt: true, tint: false, labels: true },
+  bubbles:   { form: "bubble", sizing: "fixed", tether: "none", anchor: "none", k: 10, bounce: 0, gap: 12, water: false, breathe: false, crowd: "spread", tilt: false, tint: true, labels: true },
+  harbour:   { form: "circle", sizing: "importance", tether: "string", anchor: "dot", k: 3, bounce: 30, gap: 8, water: true, breathe: true, crowd: "spread", tilt: false, tint: true, labels: true },
+  focus:     { form: "card", sizing: "focus", tether: "line", anchor: "dot", k: 10, bounce: 20, gap: 6, water: false, breathe: false, crowd: "spread", tilt: true, tint: true, labels: true },
+  piles:     { form: "card", sizing: "fixed", tether: "line", anchor: "dot", k: 8, bounce: 0, gap: 6, water: false, breathe: false, crowd: "pile", tilt: true, tint: false, labels: true }
+};
+function readOpts() { for (const id of IDS) { const el = $(id); opt[id] = el.type === "checkbox" ? el.checked : el.type === "range" ? +el.value : el.value; } }
+function applyPreset(p) { for (const [k, v] of Object.entries(PRESETS[p])) { const el = $(k); if (el.type === "checkbox") el.checked = v; else el.value = v; } readOpts(); kick(); }
+IDS.forEach(id => $(id).oninput = () => { readOpts(); kick(); });
+document.querySelectorAll("[data-p]").forEach(b => b.onclick = () => applyPreset(b.dataset.p));
+readOpts();
+const kick = () => map.triggerRepaint();
+
+const colourOf = it => it.color || "#d6336c";
+const tiltOf = it => (rng(it.id)() - .5) * 7;
+
+loadItems().then(items => {
+  for (const it of items) {
+    it.el = document.createElement("div");
+    it.el.innerHTML = `<img src="${it.src}" alt=""><span class="lbl">${it.title}</span><span class="n" hidden></span>`;
+    it.el.style.setProperty("--c", colourOf(it));
+    // Entering a sticker focuses it straight away; leaving waits a moment, so sliding between
+    // neighbours (or across a gap that opened up) doesn't flicker back to the resting layout.
+    it.el.onmouseenter = () => { hovered = it; clearTimeout(unfocusTimer); clearTimeout(pileTimer); if (it.members?.length) openPile = it; kick(); };
+    it.el.onmouseleave = () => {
+      unfocusTimer = setTimeout(() => { if (hovered === it) hovered = null; kick(); }, 140);
+      pileTimer = setTimeout(() => { openPile = null; kick(); }, 300);
+    };
+    it.el.onclick = () => {
+      const b = screenBox(map, it), target = Math.min(innerWidth, innerHeight) * .6;
+      map.flyTo({ center: it.center, zoom: map.getZoom() + Math.log2(target / Math.max(b.w, b.h)) });
+    };
+    layer.appendChild(it.el);
+  }
+  map.on("load", () => { waterLayers = map.getStyle().layers.filter(l => l.type === "fill" && /water/.test(l.id)).map(l => l.id); });
+  map.on("render", frame);
+  kick();
+});
+
+function size(it) {
+  let s = opt.S;
+  if (opt.sizing === "importance") s *= (.6 + .9 * clamp((Math.log2(it.wm) - 8) / 5, 0, 1)) * 2 ** ((map.getZoom() - 12) * .3);
+  if (opt.sizing === "focus") s *= it.sc ?? 1;
+  if (opt.form === "circle") return { w: s * .85, h: s * .85 };
+  const w = it.aspect >= 1 ? s : s * it.aspect, h = it.aspect >= 1 ? s / it.aspect : s;
+  return opt.form === "polaroid" ? { w: w + 10, h: h + 27 } : { w, h };
+}
+// The map can't be queried while it's drawing, so water lookups are cached on a 16px grid
+// and any missing ones are filled in just after the frame.
+const waterCache = new Map(), waterQueue = new Set();
+map.on("moveend", () => waterCache.clear());
+map.on("move", () => waterCache.clear());
+function onWater(x, y) {
+  if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) return false;
+  const key = Math.round(x / 16) + "," + Math.round(y / 16);
+  if (waterCache.has(key)) return waterCache.get(key);
+  if (!waterQueue.size) setTimeout(fillWater, 0);
+  waterQueue.add(key);
+  return false;
+}
+function fillWater() {
+  for (const key of waterQueue) {
+    const [gx, gy] = key.split(",").map(Number);
+    waterCache.set(key, map.queryRenderedFeatures([gx * 16, gy * 16], { layers: waterLayers }).length > 0);
+  }
+  waterQueue.clear();
+  kick();
+}
+
+function frame() {
+  const now = performance.now(), k = opt.k / 100, damp = opt.bounce / 100, labelRoom = opt.labels && opt.form !== "polaroid" ? 20 : 0;
+  // Focus: ease each sticker's scale and tilt towards its target. The hovered one grows and
+  // straightens; neighbours shrink a little, more the closer they are (a fisheye), far ones not at all.
+  let easing = 0;
+  const ha = hovered && map.project(hovered.center);
+  for (const it of ITEMS) {
+    let target = 1;
+    if (opt.sizing === "focus" && hovered) {
+      if (it === hovered) target = 1.9;
+      else { const a = map.project(it.center); target = 1 - .3 * Math.exp(-Math.hypot(a.x - ha.x, a.y - ha.y) / 160); }
+    }
+    const sc = it.sc ?? 1, tilt = opt.tilt && opt.form !== "bubble" && it !== hovered ? tiltOf(it) : 0, rot = it.rot ?? tilt;
+    it.sc = sc + (target - sc) * .2;
+    it.rot = rot + (tilt - rot) * .2;
+    easing = Math.max(easing, Math.abs(target - it.sc), Math.abs(tilt - it.rot) / 20);
+  }
+  let boxes = ITEMS.map(it => ({ it, a: map.project(it.center), ...size(it) }));
+  ITEMS.forEach(it => { it.members = []; it.inPile = false; });
+
+  // Piles: stickers whose spots are very close collapse into one pile, unless it's hovered open.
+  if (opt.crowd === "pile") {
+    const leaders = [];
+    for (const b of [...boxes].sort((p, q) => q.it.wm - p.it.wm)) {
+      const host = leaders.find(l => Math.abs(l.a.x - b.a.x) < (l.w + b.w) / 2 && Math.abs(l.a.y - b.a.y) < (l.h + b.h) / 2 + labelRoom);
+      if (host && openPile !== host.it) { host.it.members.push(b.it); b.it.inPile = true; }
+      else leaders.push(b);
+    }
+    boxes = boxes.filter(b => !b.it.inPile);
+  }
+
+  let moving = 0;
+  for (const b of boxes) {
+    const it = b.it;
+    if (!it.p) { it.p = { x: b.a.x, y: b.a.y }; it.v = { x: 0, y: 0 }; }
+    else if (it.pa) { it.p.x += b.a.x - it.pa.x; it.p.y += b.a.y - it.pa.y; }   // ride along with the map
+    it.pa = b.a;
+    // Spring towards its spot (with momentum when bouncy)
+    // Speech bubbles float just above their spot so the tail shows
+    let target = { x: b.a.x, y: b.a.y - (opt.form === "bubble" ? b.h / 2 + 18 + labelRoom : 0) };
+    if (opt.breathe) { const ph = rng(it.id)() * 6.28, t = (now - t0) / 1000; target.x += Math.sin(t * .6 + ph) * 6; target.y += Math.cos(t * .5 + ph) * 5; }
+    it.v.x = it.v.x * damp + (target.x - it.p.x) * k;
+    it.v.y = it.v.y * damp + (target.y - it.p.y) * k;
+    // Drift towards water: if on land, nudge toward the nearest direction that has water
+    if (opt.water && waterLayers.length && !onWater(it.p.x, it.p.y)) {
+      let best = null;
+      for (let i = 0; i < 8; i++) {
+        const ang = i * Math.PI / 4;
+        for (const r of [40, 90, 160]) {
+          const x = it.p.x + Math.cos(ang) * r, y = it.p.y + Math.sin(ang) * r;
+          if (onWater(x, y) && (!best || r < best.r)) { best = { r, x: Math.cos(ang), y: Math.sin(ang) }; break; }
+        }
+      }
+      if (best) { it.v.x += best.x * 4; it.v.y += best.y * 4; }
+    }
+    it.prev = { x: it.p.x, y: it.p.y };
+    it.p.x += it.v.x; it.p.y += it.v.y;
+  }
+  // Push overlapping stickers apart
+  for (let n = 0; n < 4; n++) for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+    const A = boxes[i], B = boxes[j], pa = A.it.p, pb = B.it.p;
+    const ox = (A.w + B.w) / 2 + opt.gap - Math.abs(pa.x - pb.x), oy = (A.h + B.h) / 2 + opt.gap + labelRoom - Math.abs(pa.y - pb.y);
+    if (ox <= 0 || oy <= 0) continue;
+    // The focused sticker holds still under the pointer; its neighbours take the whole push.
+    const wa = A.it === hovered ? 0 : B.it === hovered ? 2 : 1, wb = 2 - wa;
+    if (ox < oy) { const s = (pa.x < pb.x ? -1 : 1) * ox / 4; pa.x += s * wa; pb.x -= s * wb; }
+    else { const s = (pa.y < pb.y ? -1 : 1) * oy / 4; pa.y += s * wa; pb.y -= s * wb; }
+  }
+
+  let svg = "";
+  for (const it of ITEMS) {
+    const el = it.el;
+    if (it.inPile) { el.style.display = "none"; continue; }
+    const b = boxes.find(x => x.it === it);
+    el.style.display = "";
+    moving = Math.max(moving, Math.hypot(it.p.x - it.prev.x, it.p.y - it.prev.y));
+    place(el, { x: it.p.x, y: it.p.y, w: b.w, h: b.h, rot: it.rot });
+    el.style.boxShadow = `0 ${3 + (it.sc - 1) * 12}px ${10 + (it.sc - 1) * 26}px rgba(0,0,0,${.28 + (it.sc - 1) * .15})`;
+    const cls = `st ${opt.form}${opt.tint ? " tint" : ""}${it.members.length ? " pile" : ""}`;
+    if (el.className !== cls) el.className = cls;
+    el.style.zIndex = hovered === it ? 60 : Math.round(30 - Math.log2(it.wm));
+    el.querySelector(".lbl").hidden = !opt.labels;
+    const nEl = el.querySelector(".n"); nEl.hidden = !it.members.length; nEl.textContent = "+" + it.members.length;
+
+    // Link back to its spot
+    const a = b.a, dx = a.x - it.p.x, dy = a.y - it.p.y, far = Math.hypot(dx, dy) > Math.min(b.w, b.h) * .55;
+    if (opt.form === "bubble") {
+      // A tail from the bubble's edge to its spot
+      const ang = Math.atan2(dy, dx), ex = it.p.x + Math.cos(ang) * b.w * .3, ey = it.p.y + Math.sin(ang) * b.h * .3;
+      const px = -Math.sin(ang) * 9, py = Math.cos(ang) * 9;
+      svg += `<path class="bub" fill="${opt.tint ? colourOf(it) : "#fff"}" style="fill:${opt.tint ? colourOf(it) : "#fff"};filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))" d="M${ex + px},${ey + py} L${a.x},${a.y} L${ex - px},${ey - py} Z"/>`;
+    } else if (far && opt.tether !== "none") {
+      if (opt.tether === "line") svg += `<path d="M${it.p.x},${it.p.y} L${a.x},${a.y}"/>`;
+      else { const mx = (it.p.x + a.x) / 2, my = Math.max(it.p.y, a.y) + Math.hypot(dx, dy) * .25; svg += `<path d="M${it.p.x},${it.p.y} Q${mx},${my} ${a.x},${a.y}"/>`; }
+    }
+    if (opt.form !== "bubble" && (far || opt.anchor === "pin")) {
+      if (opt.anchor === "dot") svg += `<circle class="dot" cx="${a.x}" cy="${a.y}" r="3.5"/>`;
+      if (opt.anchor === "pin") svg += `<path class="pin" style="--c:${colourOf(it)}" d="M${a.x},${a.y} c-5,-7 -8,-10 -8,-14 a8,8 0 1 1 16,0 c0,4 -3,7 -8,14 z"/>`;
+    }
+  }
+  ties.innerHTML = svg;
+  if (moving > .15 || easing > .002 || opt.breathe) map.triggerRepaint();
+}
+</script>
+</body>
+</html>

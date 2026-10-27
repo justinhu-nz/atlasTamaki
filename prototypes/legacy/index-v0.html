@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas Tāmaki</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="ideas.js"></script>
+<style>
+  :root { --bg:#fff; --fg:#1d2228; --muted:#5f6b76; --line:#e3e6ea; --chip:#f3f4f6; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--fg); background:var(--bg); }
+  #map { position:absolute; inset:0; }
+
+  /* Top bar */
+  #bar { position:absolute; top:12px; left:12px; right:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; pointer-events:none; z-index:5; }
+  #bar > * { pointer-events:auto; }
+  .brand { background:var(--bg); padding:8px 14px; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,.15); font-weight:700; }
+  #search { padding:8px 12px; border:0; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,.15); font:inherit; width:200px; }
+  .chip { display:flex; align-items:center; gap:6px; background:var(--bg); border:0; padding:7px 12px; border-radius:999px; box-shadow:0 1px 4px rgba(0,0,0,.15); font:inherit; font-size:13px; cursor:pointer; }
+  .chip i { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .chip.off { opacity:.45; }
+  .chip.off i { background:#aaa !important; }
+
+  /* Image pins */
+  .pin { cursor:pointer; background:#fff; padding:3px; box-shadow:0 2px 8px rgba(0,0,0,.3); border-radius:6px; transition:width .2s, height .2s; position:relative; }
+  .pin img { width:100%; height:100%; object-fit:cover; display:block; border-radius:4px; }
+  .pin.small { width:46px; height:46px; border-radius:50%; }
+  .pin.small img { border-radius:50%; }
+  .pin.big { width:170px; height:112px; }
+  .pin .count { position:absolute; top:-6px; right:-6px; background:var(--fg); color:#fff; font-size:11px; font-weight:700; padding:1px 6px; border-radius:999px; }
+  .pin.ov::after { content:"overlay"; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); font-size:10px; background:var(--fg); color:#fff; padding:0 5px; border-radius:4px; }
+  .pin.hl { outline:3px solid var(--fg); }
+
+  /* Side panel */
+  #panel { position:absolute; top:0; right:0; bottom:0; width:400px; max-width:100%; background:var(--bg); box-shadow:-2px 0 12px rgba(0,0,0,.15); overflow-y:auto; transform:translateX(105%); transition:transform .25s; z-index:10; }
+  #panel.open { transform:none; }
+  #panel .inner { padding:20px 22px 40px; }
+  #panel .close { position:sticky; top:0; float:right; border:0; background:var(--chip); width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; }
+  .cat { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  .cat i { width:10px; height:10px; border-radius:50%; }
+  h1 { font-size:24px; line-height:1.2; margin:6px 0 8px; }
+  .pitch { font-size:17px; color:var(--muted); margin:0 0 16px; }
+  .gallery { display:flex; gap:8px; overflow-x:auto; margin:0 -22px 16px; padding:0 22px; }
+  .gallery figure { margin:0; flex:0 0 auto; width:240px; }
+  .gallery img { width:240px; height:150px; object-fit:cover; border-radius:8px; display:block; }
+  .gallery figcaption { font-size:12px; color:var(--muted); margin-top:4px; }
+  h2 { font-size:14px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:18px 0 4px; }
+  p { margin:0 0 8px; }
+  details { margin-top:18px; border-top:1px solid var(--line); padding-top:12px; }
+  summary { cursor:pointer; font-weight:600; }
+  table { border-collapse:collapse; width:100%; margin:8px 0; font-size:14px; }
+  td { padding:5px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+  td:first-child { color:var(--muted); width:40%; }
+  .ovctl { background:var(--chip); border-radius:8px; padding:10px 12px; margin:12px 0; font-size:14px; }
+  .ovctl input[type=range] { width:100%; }
+
+  /* List view */
+  #listBtn { margin-left:auto; }
+  #list { position:absolute; inset:0; background:var(--bg); overflow-y:auto; z-index:8; display:none; padding:70px 16px 40px; }
+  #list.open { display:block; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; max-width:1100px; margin:0 auto; }
+  .card { border:1px solid var(--line); border-radius:12px; overflow:hidden; cursor:pointer; background:var(--bg); }
+  .card img { width:100%; height:150px; object-fit:cover; display:block; }
+  .card div { padding:12px 14px; }
+  .card h3 { margin:4px 0; font-size:17px; }
+
+  @media (max-width:640px) {
+    #search { width:100%; order:9; }
+    #panel { top:auto; width:100%; height:65%; border-radius:16px 16px 0 0; transform:translateY(105%); }
+    #panel.open { transform:none; }
+    .pin.big { width:120px; height:80px; }
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="bar">
+  <div class="brand">Atlas Tāmaki</div>
+  <input id="search" type="search" placeholder="Search ideas…">
+  <div id="chips" style="display:contents"></div>
+  <button class="chip" id="listBtn">☰ List</button>
+</div>
+<div id="list"><div class="cards" id="cards"></div></div>
+<aside id="panel"><div class="inner" id="panelInner"></div></aside>
+
+<script>
+const { categories: CATS, ideas: IDEAS } = window.ATLAS;
+const OVERLAY_MINZOOM = 13.5;   // overlays appear (and their thumbnails hide) past this zoom
+const BIG_PIN_ZOOM = 13;        // pins become full cards past this zoom
+const CLUSTER_PX = 70;          // pins closer than this on screen get stacked
+
+const hidden = new Set();       // categories toggled off
+let query = "";
+let selected = null;
+
+// ---------- placeholder images (used when an image has no file) ----------
+function placeholder(text, color, overlay) {
+  const c = document.createElement("canvas"); c.width = 480; c.height = 320;
+  const g = c.getContext("2d");
+  if (overlay) {
+    g.fillStyle = "rgba(255,255,255,.6)"; g.fillRect(0,0,480,320);
+    g.strokeStyle = color; g.lineWidth = 14; g.lineCap = "round";
+    g.beginPath(); g.moveTo(20,160); g.lineTo(460,150); g.moveTo(240,10); g.lineTo(250,310); g.stroke();
+    g.strokeStyle = "#2f9e44"; g.lineWidth = 6; g.setLineDash([12,8]);
+    g.beginPath(); g.moveTo(20,180); g.lineTo(460,170); g.moveTo(262,10); g.lineTo(272,310); g.stroke();
+  } else {
+    g.fillStyle = color; g.fillRect(0,0,480,320);
+    g.fillStyle = "rgba(255,255,255,.15)";
+    for (let i = 0; i < 6; i++) { g.beginPath(); g.arc(Math.random()*480, Math.random()*320, 40+Math.random()*80, 0, 7); g.fill(); }
+  }
+  g.fillStyle = overlay ? "#1d2228" : "#fff"; g.font = "bold 26px system-ui"; g.textAlign = "center";
+  g.fillText(text.slice(0, 32), 240, overlay ? 300 : 170);
+  return c.toDataURL();
+}
+IDEAS.forEach(idea => idea.images.forEach(im => {
+  if (!im.file) im.file = placeholder(im.caption || idea.title, CATS[idea.category].color, im.kind === "overlay");
+}));
+
+const visible = idea => !hidden.has(idea.category) &&
+  (!query || (idea.title + " " + idea.pitch).toLowerCase().includes(query));
+
+// ---------- map ----------
+const map = new maplibregl.Map({
+  container: "map",
+  style: "https://tiles.openfreemap.org/styles/positron",
+  center: [174.77, -36.88], zoom: 11.3, attributionControl: { compact: true }
+});
+map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-left");
+
+function featureCollection() {
+  return { type: "FeatureCollection", features: IDEAS.filter(visible).map(i => ({
+    type: "Feature", geometry: i.geometry,
+    properties: { slug: i.slug, color: CATS[i.category].color }
+  })) };
+}
+
+map.on("load", () => {
+  map.addSource("ideas", { type: "geojson", data: featureCollection() });
+  map.addLayer({ id: "fill", type: "fill", source: "ideas", filter: ["==", "$type", "Polygon"],
+    paint: { "fill-color": ["get","color"], "fill-opacity": 0.25 } });
+  map.addLayer({ id: "line-casing", type: "line", source: "ideas", filter: ["!=", "$type", "Point"],
+    layout: { "line-cap": "round", "line-join": "round" },
+    paint: { "line-color": "#fff", "line-width": ["case", ["==", ["get","slug"], ""], 0, 8] } });
+  map.addLayer({ id: "line", type: "line", source: "ideas", filter: ["!=", "$type", "Point"],
+    layout: { "line-cap": "round", "line-join": "round" },
+    paint: { "line-color": ["get","color"], "line-width": 4 } });
+  map.addLayer({ id: "point", type: "circle", source: "ideas", filter: ["==", "$type", "Point"],
+    paint: { "circle-color": ["get","color"], "circle-radius": 7, "circle-stroke-color": "#fff", "circle-stroke-width": 2 } });
+
+  // Overlays: images stretched to four ground corners
+  IDEAS.forEach(idea => idea.images.forEach((im, j) => {
+    if (im.kind !== "overlay") return;
+    im.layerId = `ov-${idea.slug}-${j}`;
+    map.addSource(im.layerId, { type: "image", url: im.file, coordinates: im.corners });
+    map.addLayer({ id: im.layerId, type: "raster", source: im.layerId, minzoom: im.minzoom ?? OVERLAY_MINZOOM,
+      paint: { "raster-opacity": im.opacity ?? 0.8, "raster-fade-duration": 0 } }, "line-casing");
+  }));
+
+  for (const l of ["fill","line","point"]) {
+    map.on("click", l, e => select(e.features[0].properties.slug));
+    map.on("mouseenter", l, () => map.getCanvas().style.cursor = "pointer");
+    map.on("mouseleave", l, () => map.getCanvas().style.cursor = "");
+  }
+  buildPins();
+  refresh();
+  if (location.hash.length > 1) select(decodeURIComponent(location.hash.slice(1)), true);
+});
+
+// ---------- image pins with zoom sizing + stacking ----------
+const pins = [];
+function buildPins() {
+  IDEAS.forEach(idea => idea.images.forEach(im => {
+    const el = document.createElement("div");
+    el.className = "pin" + (im.kind === "overlay" ? " ov" : "");
+    el.innerHTML = `<img alt=""><span class="count" hidden></span>`;
+    el.querySelector("img").src = im.file;
+    el.title = idea.title;
+    const lngLat = im.kind === "overlay" ? centre(im.corners) : im.at;
+    el.addEventListener("click", ev => {
+      ev.stopPropagation();
+      const p = pins.find(p => p.el === el);
+      if (p.stack > 1) { map.easeTo({ center: lngLat, zoom: map.getZoom() + 2 }); return; }
+      if (im.kind === "overlay") map.fitBounds(bounds(im.corners), { padding: 80 });
+      select(idea.slug);
+    });
+    el.addEventListener("mouseenter", () => highlight(idea.slug));
+    el.addEventListener("mouseleave", () => highlight(selected));
+    const marker = new maplibregl.Marker({ element: el }).setLngLat(lngLat).addTo(map);
+    pins.push({ el, marker, idea, im, lngLat, stack: 1 });
+  }));
+  map.on("move", layoutPins);
+}
+function layoutPins() {
+  const z = map.getZoom();
+  const big = z >= BIG_PIN_ZOOM;
+  const leaders = [];
+  for (const p of pins) {
+    const show = visible(p.idea) && !(p.im.kind === "overlay" && z >= (p.im.minzoom ?? OVERLAY_MINZOOM));
+    p.el.style.display = show ? "" : "none";
+    p.stack = 1;
+    if (!show) continue;
+    p.el.classList.toggle("big", big); p.el.classList.toggle("small", !big);
+    const pt = map.project(p.lngLat);
+    const gap = big ? CLUSTER_PX * 2 : CLUSTER_PX;
+    const lead = leaders.find(l => Math.abs(l.pt.x - pt.x) < gap && Math.abs(l.pt.y - pt.y) < gap * 0.7);
+    if (lead) { lead.p.stack++; p.el.style.display = "none"; }
+    else leaders.push({ p, pt });
+  }
+  for (const p of pins) {
+    const c = p.el.querySelector(".count");
+    c.hidden = p.stack < 2; c.textContent = "+" + (p.stack - 1);
+  }
+}
+const centre = cs => [cs.reduce((a,c)=>a+c[0],0)/cs.length, cs.reduce((a,c)=>a+c[1],0)/cs.length];
+function bounds(cs) {
+  const b = new maplibregl.LngLatBounds(cs[0], cs[0]); cs.forEach(c => b.extend(c)); return b;
+}
+function geomBounds(g) {
+  const flat = g.type === "Point" ? [g.coordinates] : g.type === "LineString" ? g.coordinates : g.coordinates.flat();
+  return bounds(flat);
+}
+
+// ---------- selection + panel ----------
+function highlight(slug) {
+  if (!map.getLayer("line")) return;
+  const on = ["==", ["get","slug"], slug || ""];
+  map.setPaintProperty("line", "line-width", ["case", on, 8, 4]);
+  map.setPaintProperty("line-casing", "line-width", ["case", on, 12, 8]);
+  map.setPaintProperty("fill", "fill-opacity", ["case", on, 0.45, 0.25]);
+  pins.forEach(p => p.el.classList.toggle("hl", p.idea.slug === slug));
+}
+
+function select(slug, fly) {
+  const idea = IDEAS.find(i => i.slug === slug);
+  if (!idea) return;
+  selected = slug;
+  history.replaceState(null, "", "#" + slug);
+  highlight(slug);
+  document.getElementById("list").classList.remove("open");
+  const cat = CATS[idea.category];
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+  const overlays = idea.images.filter(i => i.kind === "overlay");
+  const details = Object.entries(idea.details || {});
+  document.getElementById("panelInner").innerHTML = `
+    <button class="close" aria-label="Close">×</button>
+    <span class="cat"><i style="background:${cat.color}"></i>${cat.label}</span>
+    <h1>${esc(idea.title)}</h1>
+    <p class="pitch">${esc(idea.pitch)}</p>
+    ${idea.images.length ? `<div class="gallery">${idea.images.map(im => `
+      <figure><img src="${im.file}" alt=""><figcaption>${esc(im.caption || "")}${im.credit ? " · " + esc(im.credit) : ""}</figcaption></figure>`).join("")}</div>` : ""}
+    ${overlays.map((im, k) => `
+      <div class="ovctl">Overlay: ${esc(im.caption || "drawing")} <small>(zoom in to see it)</small>
+        <input type="range" min="0" max="1" step="0.05" value="${im.opacity ?? 0.8}" data-ov="${k}" aria-label="Overlay opacity">
+      </div>`).join("")}
+    <h2>What it is</h2><p>${esc(idea.what_it_is)}</p>
+    <h2>Why it matters</h2><p>${esc(idea.why_it_matters)}</p>
+    <details><summary>More detail &amp; sources</summary>
+      ${details.length ? `<table>${details.map(([k,v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</table>` : ""}
+      ${idea.proposed_by ? `<h2>Proposed by</h2><p>${esc(idea.proposed_by)}</p>` : ""}
+      <h2>Sources</h2>
+      ${idea.sources.length ? `<ul>${idea.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join("")}</ul>` : "<p>None added yet.</p>"}
+    </details>`;
+  const panel = document.getElementById("panel");
+  panel.classList.add("open");
+  panel.querySelector(".close").onclick = closePanel;
+  panel.querySelectorAll("[data-ov]").forEach(r => r.oninput = () => {
+    const im = overlays[r.dataset.ov]; im.opacity = +r.value;
+    map.setPaintProperty(im.layerId, "raster-opacity", im.opacity);
+  });
+  if (fly) map.fitBounds(geomBounds(idea.geometry), { padding: { top: 80, bottom: 80, left: 80, right: 480 }, maxZoom: 15 });
+}
+function closePanel() {
+  selected = null; highlight(null);
+  document.getElementById("panel").classList.remove("open");
+  history.replaceState(null, "", location.pathname);
+}
+map.on("click", e => {
+  if (!map.queryRenderedFeatures(e.point, { layers: ["fill","line","point"] }).length) closePanel();
+});
+
+// ---------- filters, search, list ----------
+const chips = document.getElementById("chips");
+for (const [key, c] of Object.entries(CATS)) {
+  const b = document.createElement("button");
+  b.className = "chip"; b.innerHTML = `<i style="background:${c.color}"></i>${c.label}`;
+  b.onclick = () => { hidden.has(key) ? hidden.delete(key) : hidden.add(key); b.classList.toggle("off"); refresh(); };
+  chips.appendChild(b);
+}
+document.getElementById("search").oninput = e => { query = e.target.value.trim().toLowerCase(); refresh(); };
+document.getElementById("listBtn").onclick = () => document.getElementById("list").classList.toggle("open");
+
+function refresh() {
+  if (map.getSource("ideas")) map.getSource("ideas").setData(featureCollection());
+  IDEAS.forEach(i => i.images.forEach(im => {
+    if (im.layerId && map.getLayer(im.layerId)) map.setLayoutProperty(im.layerId, "visibility", visible(i) ? "visible" : "none");
+  }));
+  layoutPins();
+  document.getElementById("cards").innerHTML = IDEAS.filter(visible).map(i => `
+    <div class="card" data-slug="${i.slug}">
+      ${i.images[0] ? `<img src="${i.images[0].file}" alt="">` : ""}
+      <div><span class="cat"><i style="background:${CATS[i.category].color}"></i>${CATS[i.category].label}</span>
+      <h3>${i.title}</h3><p>${i.pitch}</p></div>
+    </div>`).join("");
+  document.querySelectorAll(".card").forEach(c => c.onclick = () => select(c.dataset.slug, true));
+}
+</script>
+</body>
+</html>

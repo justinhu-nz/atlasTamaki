@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C: Image editor</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="items.js"></script>
+<link rel="stylesheet" href="proto.css">
+<style>
+  #layer { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .im { position:absolute; pointer-events:auto; cursor:move; box-sizing:border-box; }
+  .im img { width:100%; height:100%; object-fit:fill; display:block; pointer-events:none; user-select:none; }
+  .im.sel { outline:2px solid #1c7ed6; outline-offset:1px; }
+  .h { position:absolute; width:14px; height:14px; background:#fff; border:2px solid #1c7ed6; border-radius:50%; display:none; }
+  .sel .h { display:block; }
+  .h.scale { right:-9px; bottom:-9px; cursor:nwse-resize; }
+  .h.rot { left:50%; top:-36px; margin-left:-9px; cursor:grab; }
+  .sel .stick { position:absolute; left:50%; top:-22px; height:22px; border-left:2px solid #1c7ed6; }
+  #drop { position:absolute; inset:0; background:rgba(28,126,214,.12); border:3px dashed #1c7ed6; display:none; place-items:center; font-size:22px; font-weight:600; color:#1c7ed6; z-index:40; }
+  #drop.on { display:grid; }
+  #side { position:absolute; top:12px; right:12px; width:250px; background:#fff; border-radius:10px; box-shadow:0 1px 6px rgba(0,0,0,.2); padding:12px 14px; z-index:5; font-size:13px; }
+  #side input[type=text] { width:100%; box-sizing:border-box; padding:5px 7px; border:1px solid #ccd; border-radius:6px; font:inherit; margin:2px 0 8px; }
+  #side input[type=range] { width:100%; }
+  #side button { font:inherit; padding:6px 10px; border-radius:6px; border:1px solid #ccd; background:#f6f7f9; cursor:pointer; }
+  #side .muted { color:#5f6b76; }
+  @media (max-width:700px) { #side { top:auto; bottom:36px; left:12px; right:12px; width:auto; } }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="layer"></div>
+<div id="drop">Drop images to place them on the map</div>
+<div class="note">
+  <span><b>C · Editor</b>: how content goes in. Drag image files onto the map (or use Add). Then drag to move, use the corner handle to scale and the top handle to rotate. Arrow keys nudge it; [ and ] rotate; Delete removes it.</span>
+  <nav><a href="a-stickers.html">A · Stickers</a> · <a href="b-tiles.html">B · Tiles</a> · <a href="c-editor.html">C · Editor</a></nav>
+</div>
+<aside id="side">
+  <div id="none" class="muted">Click an image to edit it.</div>
+  <div id="form" hidden>
+    <label>Title<input type="text" id="f-title"></label>
+    <label>Credit<input type="text" id="f-credit" placeholder="e.g. Auckland Transport"></label>
+    <label>See-through while lining up<input type="range" id="f-op" min=".2" max="1" step=".05" value=".7"></label>
+    <div class="muted" id="f-info"></div>
+  </div>
+  <p><button id="add">Add images…</button> <button id="export">Export JSON</button></p>
+  <input type="file" id="file" accept="image/*" multiple hidden>
+</aside>
+<script>
+const map = newMap(), layer = document.getElementById("layer");
+let sel = null, n = 0;
+const $ = id => document.getElementById(id);
+
+loadItems().then(items => { items.forEach(addEl); map.on("move", render); render(); });
+
+function addEl(it) {
+  it.el = document.createElement("div");
+  it.el.className = "im";
+  it.el.innerHTML = `<img src="${it.src}" alt=""><span class="stick"></span><span class="h rot"></span><span class="h scale"></span>`;
+  layer.appendChild(it.el);
+  it.el.addEventListener("pointerdown", e => startDrag(e, it, e.target.classList.contains("scale") ? "scale" : e.target.classList.contains("rot") ? "rot" : "move"));
+}
+function render() {
+  for (const it of ITEMS) {
+    place(it.el, screenBox(map, it));
+    it.el.style.opacity = it === sel ? $("f-op").value : .92;
+    it.el.style.zIndex = it === sel ? 40 : Math.round(20 - Math.log2(it.wm));
+  }
+}
+
+// ---------- move / scale / rotate ----------
+function startDrag(e, it, mode) {
+  e.preventDefault(); e.stopPropagation();
+  select(it);
+  map.dragPan.disable();
+  const c0 = map.project(it.center), p0 = { x: e.clientX, y: e.clientY };
+  const d0 = Math.hypot(p0.x - c0.x, p0.y - c0.y), wm0 = it.wm;
+  const move = ev => {
+    const p = { x: ev.clientX, y: ev.clientY };
+    if (mode === "move") { const ll = map.unproject([c0.x + p.x - p0.x, c0.y + p.y - p0.y]); it.center = [ll.lng, ll.lat]; }
+    if (mode === "scale") it.wm = wm0 * Math.hypot(p.x - c0.x, p.y - c0.y) / d0;
+    if (mode === "rot") it.rot = Math.round(Math.atan2(p.x - c0.x, c0.y - p.y) * 180 / Math.PI * 2) / 2;
+    render(); info();
+  };
+  const up = () => { removeEventListener("pointermove", move); removeEventListener("pointerup", up); map.dragPan.enable(); };
+  addEventListener("pointermove", move); addEventListener("pointerup", up);
+}
+function select(it) {
+  ITEMS.forEach(i => i.el.classList.toggle("sel", i === it));
+  sel = it;
+  $("none").hidden = !!it; $("form").hidden = !it;
+  if (it) { $("f-title").value = it.title || ""; $("f-credit").value = it.credit || ""; info(); }
+  render();
+}
+function info() { if (sel) $("f-info").textContent = `${Math.round(sel.wm)} m wide · rotated ${sel.rot}°`; }
+map.on("click", () => select(null));
+$("f-title").oninput = e => sel.title = e.target.value;
+$("f-credit").oninput = e => sel.credit = e.target.value;
+$("f-op").oninput = render;
+addEventListener("keydown", e => {
+  if (!sel || e.target.tagName === "INPUT") return;
+  const c = map.project(sel.center), step = e.shiftKey ? 10 : 1;
+  const nudge = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+  if (nudge) { const ll = map.unproject([c.x + nudge[0], c.y + nudge[1]]); sel.center = [ll.lng, ll.lat]; }
+  else if (e.key === "[") sel.rot -= .5;
+  else if (e.key === "]") sel.rot += .5;
+  else if (e.key === "Delete" || e.key === "Backspace") { sel.el.remove(); ITEMS.splice(ITEMS.indexOf(sel), 1); select(null); return; }
+  else return;
+  e.preventDefault(); render(); info();
+});
+
+// ---------- adding images ----------
+async function addFiles(files, at) {
+  for (const f of [...files].filter(f => f.type.startsWith("image/"))) {
+    const src = URL.createObjectURL(f), img = new Image(); img.src = src; await img.decode();
+    const ll = at || map.getCenter();
+    // Start at 40% of the screen width, so it can be lined up right away
+    const it = { id: "new-" + ++n, title: f.name.replace(/\.\w+$/, ""), file: "images/" + f.name, src,
+      center: [ll.lng, ll.lat], wm: innerWidth * .4 * metresPerPx(ll.lat, map.getZoom()), rot: 0, aspect: img.naturalWidth / img.naturalHeight };
+    ITEMS.push(it); addEl(it); select(it);
+  }
+}
+$("add").onclick = () => $("file").click();
+$("file").onchange = e => addFiles(e.target.files);
+addEventListener("dragover", e => { e.preventDefault(); $("drop").classList.add("on"); });
+addEventListener("dragleave", e => { if (!e.relatedTarget) $("drop").classList.remove("on"); });
+addEventListener("drop", e => {
+  e.preventDefault(); $("drop").classList.remove("on");
+  addFiles(e.dataTransfer.files, map.unproject([e.clientX, e.clientY]));
+});
+
+$("export").onclick = () => {
+  const out = ITEMS.map(({ id, title, credit, file, center, wm, rot }) => ({ id, title, credit, file: file || "(stand-in)",
+    center: center.map(v => +v.toFixed(6)), width_m: Math.round(wm), rotation: rot }));
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" }));
+  a.download = "atlas-images.json"; a.click();
+};
+</script>
+</body>
+</html>

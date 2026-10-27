@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B: Tiles</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="items.js"></script>
+<link rel="stylesheet" href="proto.css">
+<style>
+  #layer { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  #ties { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  #ties line { stroke:#1d2228; stroke-width:1.2; opacity:.4; }
+  #ties circle { fill:#1d2228; stroke:#fff; stroke-width:1.5; }
+  .im { position:absolute; pointer-events:auto; cursor:pointer; box-sizing:border-box; background:#fff; }
+  .im img { width:100%; height:100%; object-fit:cover; display:block; }
+  .im.settle { transition:transform .3s; }
+  .im .t { position:absolute; left:50%; top:100%; transform:translate(-50%,6px); background:#1d2228; color:#fff; font-size:12px; padding:2px 8px; border-radius:6px; white-space:nowrap; opacity:0; transition:opacity .15s; pointer-events:none; }
+  .im:hover { z-index:50 !important; }
+  .im:hover .t { opacity:1; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="layer"><svg id="ties"></svg></div>
+<div class="note">
+  <span><b>B · Tiles</b>: zoomed out, every image becomes the same-size square tile, snapped to a honeycomb grid near its real spot, so they never overlap and read like a contact sheet. As you zoom in, each tile grows and turns into its real map-scale shape once it's big enough.</span>
+  <label>Tile size <input id="size" type="range" min="44" max="120" value="72"></label>
+  <nav><a href="a-stickers.html">A · Stickers</a> · <a href="b-tiles.html">B · Tiles</a> · <a href="c-editor.html">C · Editor</a></nav>
+</div>
+<script>
+const map = newMap(), layer = document.getElementById("layer"), ties = document.getElementById("ties"), sizeEl = document.getElementById("size");
+let level = null;
+
+loadItems().then(items => {
+  for (const it of items) {
+    it.el = document.createElement("div");
+    it.el.className = "im";
+    it.el.innerHTML = `<img src="${it.src}" alt=""><span class="t">${it.title}</span>`;
+    it.el.onclick = () => {
+      const b = screenBox(map, it), target = Math.min(innerWidth, innerHeight) * .6;
+      map.flyTo({ center: it.center, zoom: map.getZoom() + Math.log2(target / Math.max(b.w, b.h)) });
+    };
+    layer.appendChild(it.el);
+  }
+  map.on("move", render);
+  sizeEl.oninput = () => { level = null; render(); };
+  render();
+});
+
+// Snap tiles to a hex grid in map (Mercator) units for the current whole zoom level,
+// so the arrangement holds still while panning and only reshuffles when the level changes.
+function assign(L, T) {
+  const world = 512 * 2 ** L, cell = T * 1.14 / world, rowH = cell * .866, taken = new Set();
+  const order = [...ITEMS].sort((a, b) => b.wm - a.wm);
+  for (const it of order) {
+    const m = maplibregl.MercatorCoordinate.fromLngLat(it.center);
+    const r0 = Math.round(m.y / rowH);
+    let best = null;
+    for (let dr = -4; dr <= 4; dr++) for (let dc = -4; dc <= 4; dc++) {
+      const r = r0 + dr, off = (r & 1) * cell / 2, c = Math.round((m.x - off) / cell) + dc;
+      if (taken.has(r + ":" + c)) continue;
+      const x = c * cell + off, y = r * rowH, d = Math.hypot(x - m.x, y - m.y);
+      if (!best || d < best.d) best = { d, key: r + ":" + c, x, y };
+    }
+    it.cell = best ? new maplibregl.MercatorCoordinate(best.x, best.y).toLngLat() : null;
+    if (best) taken.add(best.key);
+  }
+}
+
+function render() {
+  const T = +sizeEl.value, z = map.getZoom(), L = Math.floor(z);
+  const relevel = L !== level;
+  if (relevel) { assign(L, T); level = L; }
+  let svg = "";
+  for (const it of ITEMS) {
+    const el = it.el, b = screenBox(map, it);
+    el.classList.toggle("settle", relevel);
+    if (!it.cell) { el.style.display = "none"; continue; }
+    el.style.display = "";
+    // t: 0 = tile, 1 = true map scale. Each image switches when its own size is big enough.
+    const long = Math.max(b.w, b.h), t = clamp((long - T * 1.8) / (T * 1.2), 0, 1);
+    const tc = map.project(it.cell);
+    const box = {
+      x: tc.x + (b.x - tc.x) * t, y: tc.y + (b.y - tc.y) * t,
+      w: T + (b.w - T) * t, h: T + (b.h - T) * t, rot: b.rot * t
+    };
+    place(el, box);
+    const pad = 4 * (1 - t);
+    Object.assign(el.style, { padding: pad + "px", borderRadius: (T / 2) * (1 - t) * .25 + 2 + "px",
+      boxShadow: `0 ${3 - t * 2}px ${10 - t * 6}px rgba(0,0,0,${.3 - t * .1})`,
+      zIndex: t < 1 ? 30 : Math.round(20 - Math.log2(it.wm)) });
+    el.querySelector("img").style.borderRadius = el.style.borderRadius;
+    // Inside a huge image: let the streets show through
+    el.style.opacity = t < 1 ? 1 : clamp(1.15 - (long / Math.min(innerWidth, innerHeight) - .5) * .7, .3, .95);
+    // Tie each tile back to its true spot while it's away from it
+    if (t < 1 && Math.hypot(box.x - b.x, box.y - b.y) > T * .55)
+      svg += `<line x1="${box.x}" y1="${box.y}" x2="${b.x}" y2="${b.y}"/><circle cx="${b.x}" cy="${b.y}" r="3"/>`;
+  }
+  ties.innerHTML = svg;
+}
+</script>
+</body>
+</html>

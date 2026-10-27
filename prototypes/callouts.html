@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype: Callouts</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="proto.js"></script>
+<link rel="stylesheet" href="proto.css">
+<style>
+  #cards { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  #leaders { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  #leaders line { stroke:#1d2228; stroke-width:1.5; opacity:.45; }
+  #leaders circle { fill:#1d2228; stroke:#fff; stroke-width:1.5; }
+  #leaders .hl line { opacity:1; stroke-width:2.5; }
+  .card { position:absolute; pointer-events:auto; background:#fff; padding:4px; border-radius:3px; cursor:pointer;
+    box-shadow:0 3px 10px rgba(0,0,0,.25); transform:rotate(var(--tilt));
+    transition:left .35s, top .35s, width .35s, box-shadow .2s; }
+  .card.moving { transition:none; }
+  .card:hover, .card.hl { box-shadow:0 6px 20px rgba(0,0,0,.4); z-index:3; }
+  .card img { display:block; width:100%; object-fit:cover; }
+  .card .cap { font-size:11px; line-height:16px; height:16px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .card .kind { position:absolute; top:-8px; left:-8px; background:#1d2228; color:#fff; font-size:10px; padding:1px 6px; border-radius:999px; }
+  .card.placed img { opacity:.3; }
+  .card.placed .kind::after { content:" · placed, click to lift"; }
+  .fly { position:absolute; left:0; top:0; transform-origin:0 0; z-index:5; pointer-events:none; box-shadow:0 10px 30px rgba(0,0,0,.35); }
+  #lb { position:fixed; inset:0; background:rgba(20,24,28,.75); display:none; place-items:center; z-index:20; cursor:zoom-out; }
+  #lb.open { display:grid; }
+  #lb figure { margin:0; background:#fff; padding:8px; border-radius:6px; max-width:90vw; }
+  #lb img { max-width:86vw; max-height:78vh; display:block; }
+  #lb figcaption { font-size:13px; padding-top:6px; }
+  .note .modes label { display:inline; margin-right:10px; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="cards"><svg id="leaders"></svg></div>
+<div id="lb"><figure><img alt=""><figcaption></figcaption></figure></div>
+<div class="note">
+  <span><b>Callouts</b>: the map shows <i>where</i> (footprints). The images sit beside it as cards in empty space, mostly over the water, with leader lines.</span>
+  <span>Hover a card to light up its footprint. Click a drawing card to drop it into place. Click a photo to enlarge it.</span>
+  <span class="modes">Drawings on the map until placed:
+    <label><input type="radio" name="mode" value="outline" checked> Outline only</label>
+    <label><input type="radio" name="mode" value="faint"> Faint original</label>
+  </span>
+  <nav><a href="callouts.html">Callouts</a> · <a href="lens.html">Lens</a> · <a href="side.html">Side by side</a> · <a href="fade.html">Faded until hovered</a></nav>
+</div>
+<script>
+// ---------- sample items: one real figure, the rest stand-ins for your Felt images ----------
+const M = 111320;
+// Rectangle footprint from centre, size in metres and clockwise rotation -> [TL, TR, BR, BL]
+function rect([lng, lat], wm, hm, deg) {
+  const t = deg * Math.PI / 180, k = Math.cos(lat * Math.PI / 180);
+  return [[-1,1],[1,1],[1,-1],[-1,-1]].map(([sx, sy]) => {
+    const x = sx * wm / 2, y = sy * hm / 2;
+    return [lng + (x * Math.cos(t) + y * Math.sin(t)) / (M * k), lat + (-x * Math.sin(t) + y * Math.cos(t)) / M];
+  });
+}
+const ITEMS = [
+  { id: "alr", kind: "drawing", title: "Airport light rail: long-list options", file: OVERLAY.url, corners: OVERLAY.corners,
+    mask: [[0, .735, .43, .96], [0, .96, 1, 1]] },   // crop out legend + caption (fractions of the image)
+  { id: "panmure", kind: "drawing", title: "Panmure junction redesign (stand-in)", color: "#2f9e44", corners: rect([174.8505, -36.8985], 500, 420, 0) },
+  { id: "otahuhu", kind: "drawing", title: "Ōtāhuhu corridor sketch (stand-in)", color: "#d6336c", corners: rect([174.8330, -36.9440], 700, 2200, -12) },
+  { id: "glen-innes", kind: "photo", title: "Glen Innes station (stand-in)", color: "#1c7ed6", at: [174.8555, -36.8790] },
+  { id: "sylvia", kind: "photo", title: "Sylvia Park station (stand-in)", color: "#e8590c", at: [174.8415, -36.9175] },
+  { id: "greenlane", kind: "photo", title: "Greenlane (stand-in)", color: "#7048e8", at: [174.7970, -36.8895] },
+  { id: "east", kind: "photo", title: "Eastern busway network (stand-in)", color: "#0ca678", at: [174.9000, -36.9120] }
+];
+
+// ---------- stand-in images ----------
+function rng(seed) { let s = [...seed].reduce((a, c) => a * 31 + c.charCodeAt(0) >>> 0, 7); return () => (s = s * 1664525 + 1013904223 >>> 0) / 2 ** 32; }
+function fakePhoto(it) {
+  const c = document.createElement("canvas"); c.width = 400; c.height = 280; const g = c.getContext("2d"), r = rng(it.id);
+  const gr = g.createLinearGradient(0, 0, 0, 280); gr.addColorStop(0, "#cfe3f5"); gr.addColorStop(1, "#f4f1ea"); g.fillStyle = gr; g.fillRect(0, 0, 400, 280);
+  for (let i = 0; i < 9; i++) { g.fillStyle = i % 3 ? "#9aa3ad" : it.color; const w = 30 + r() * 70, h = 50 + r() * 140; g.fillRect(r() * 380, 280 - h - 40, w, h); }
+  g.fillStyle = "#555"; g.fillRect(0, 240, 400, 40);
+  g.fillStyle = "#1d2228"; g.font = "bold 20px system-ui"; g.fillText(it.title.replace(" (stand-in)", ""), 14, 30);
+  return c.toDataURL();
+}
+function fakeSketch(it) {
+  const [p0, p1, , p3] = it.corners, k = Math.cos(p0[1] * Math.PI / 180);
+  const wm = Math.hypot((p1[0] - p0[0]) * M * k, (p1[1] - p0[1]) * M), hm = Math.hypot((p3[0] - p0[0]) * M * k, (p3[1] - p0[1]) * M);
+  const c = document.createElement("canvas"); c.width = 500; c.height = Math.round(500 * hm / wm); const g = c.getContext("2d"), r = rng(it.id);
+  g.fillStyle = "#f2f2f0"; g.fillRect(0, 0, c.width, c.height);
+  g.strokeStyle = "#c4c7cc"; g.lineWidth = 14;                         // grey "existing streets": ink mode drops these
+  for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(r() * 500, 0); g.lineTo(r() * 500, c.height); g.stroke(); g.beginPath(); g.moveTo(0, r() * c.height); g.lineTo(500, r() * c.height); g.stroke(); }
+  g.lineCap = "round"; g.strokeStyle = it.color; g.lineWidth = 16;   // coloured "proposal": ink mode keeps it
+  g.beginPath(); g.moveTo(250, 0); g.bezierCurveTo(150, c.height * .3, 350, c.height * .6, 240, c.height); g.stroke();
+  g.strokeStyle = "#1c7ed6"; g.lineWidth = 7; g.setLineDash([16, 10]);
+  g.beginPath(); g.moveTo(0, c.height * .45); g.lineTo(500, c.height * .52); g.stroke();
+  g.setLineDash([]); g.fillStyle = "#444"; g.font = "bold 22px system-ui"; g.fillText("Sketch (stand-in)", 14, 32);
+  return c.toDataURL();
+}
+
+// Crop masked areas (e.g. a figure's legend and caption) by making them transparent.
+function cropImage(img, mask) {
+  if (!mask) return img.src;
+  const c = document.createElement("canvas"); c.width = img.naturalWidth; c.height = img.naturalHeight;
+  const g = c.getContext("2d"); g.drawImage(img, 0, 0);
+  for (const [x0, y0, x1, y1] of mask) g.clearRect(x0 * c.width, y0 * c.height, (x1 - x0) * c.width, (y1 - y0) * c.height);
+  return c.toDataURL();
+}
+const loadImg = src => { const i = new Image(); i.src = src; return i.decode().then(() => i); };
+
+// ---------- geometry helpers ----------
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (z, z0, z1, a, b) => a + (b - a) * clamp((z - z0) / (z1 - z0), 0, 1);
+const bbox = pts => ({ x0: Math.min(...pts.map(p => p.x)), y0: Math.min(...pts.map(p => p.y)), x1: Math.max(...pts.map(p => p.x)), y1: Math.max(...pts.map(p => p.y)) });
+const ov = (a, b) => Math.max(0, Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0)) * Math.max(0, Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0));
+function inPoly(pt, poly) {
+  let c = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++)
+    if ((poly[i].y > pt.y) !== (poly[j].y > pt.y) && pt.x < (poly[j].x - poly[i].x) * (pt.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x) c = !c;
+  return c;
+}
+function nearestOnPoly(pt, poly) {
+  let best = null, bd = Infinity;
+  for (let i = 0; i < poly.length; i++) {
+    const a = poly[i], b = poly[(i + 1) % poly.length], dx = b.x - a.x, dy = b.y - a.y;
+    const t = clamp(((pt.x - a.x) * dx + (pt.y - a.y) * dy) / (dx * dx + dy * dy || 1), 0, 1);
+    const q = { x: a.x + t * dx, y: a.y + t * dy }, d = Math.hypot(q.x - pt.x, q.y - pt.y);
+    if (d < bd) { bd = d; best = q; }
+  }
+  return best;
+}
+const nearestOnRect = (pt, R) => ({ x: clamp(pt.x, R.x0, R.x1), y: clamp(pt.y, R.y0, R.y1) });
+
+// ---------- map ----------
+const map = new maplibregl.Map({ container: "map", style: STYLE, center: [174.83, -36.925], zoom: 12.2 });
+const mapEl = document.getElementById("map"), cardsEl = document.getElementById("cards"), svg = document.getElementById("leaders");
+let waterLayers = [], mode = "outline", busy = false;
+
+const ready = Promise.all(ITEMS.map(async it => {
+  it.src = it.file || (it.kind === "drawing" ? fakeSketch(it) : fakePhoto(it));
+  it.img = await loadImg(it.src);
+  it.aspect = it.img.naturalWidth / it.img.naturalHeight;
+  if (it.kind === "drawing") it.cardSrc = it.cropped = cropImage(it.img, it.mask);
+  else it.cardSrc = it.src;
+  it.center = it.at || [it.corners.reduce((a, c) => a + c[0], 0) / 4, it.corners.reduce((a, c) => a + c[1], 0) / 4];
+}));
+
+map.on("load", async () => {
+  await ready;
+  waterLayers = map.getStyle().layers.filter(l => l.type === "fill" && /water/.test(l.id)).map(l => l.id);
+  for (const it of ITEMS.filter(i => i.kind === "drawing")) {
+    map.addSource(it.id + "-orig", { type: "image", url: it.cropped, coordinates: it.corners });
+    map.addLayer({ id: it.id + "-orig", type: "raster", source: it.id + "-orig", paint: { "raster-opacity": 0, "raster-fade-duration": 0, "raster-opacity-transition": { duration: 0 } } });
+  }
+  map.addSource("fp", { type: "geojson", promoteId: "id", data: { type: "FeatureCollection", features: ITEMS.map(it => ({
+    type: "Feature", properties: { id: it.id },
+    geometry: it.at ? { type: "Point", coordinates: it.at } : { type: "Polygon", coordinates: [[...it.corners, it.corners[0]]] } })) } });
+  const hov = ["boolean", ["feature-state", "hover"], false];
+  map.addLayer({ id: "fp-fill", type: "fill", source: "fp", filter: ["==", "$type", "Polygon"], paint: { "fill-color": "#1d2228", "fill-opacity": ["case", hov, .08, 0] } });
+  map.addLayer({ id: "fp-line", type: "line", source: "fp", filter: ["==", "$type", "Polygon"],
+    paint: { "line-color": "#1d2228", "line-width": ["case", hov, 2.5, 1.2], "line-opacity": ["case", hov, .9, .45], "line-dasharray": [3, 2] } });
+  map.addLayer({ id: "fp-pt", type: "circle", source: "fp", filter: ["==", "$type", "Point"],
+    paint: { "circle-color": "#1d2228", "circle-radius": ["case", hov, 7, 4], "circle-stroke-color": "#fff", "circle-stroke-width": 2 } });
+  buildCards();
+  layout();
+  map.on("move", follow);
+  map.on("moveend", layout);
+});
+
+// ---------- cards ----------
+function buildCards() {
+  for (const it of ITEMS) {
+    const el = it.el = document.createElement("div");
+    el.className = "card";
+    el.style.setProperty("--tilt", ((rng(it.id)() - .5) * 4).toFixed(1) + "deg");
+    el.innerHTML = `<span class="kind">${it.kind === "drawing" ? "drawing" : "photo"}</span><img alt=""><div class="cap"></div>`;
+    el.querySelector("img").src = it.cardSrc;
+    el.querySelector(".cap").textContent = it.title;
+    el.title = it.title;
+    el.onmouseenter = () => hover(it, true);
+    el.onmouseleave = () => hover(it, false);
+    el.onclick = () => it.kind === "drawing" ? togglePlace(it) : lightbox(it);
+    cardsEl.appendChild(el);
+  }
+}
+function hover(it, on) {
+  map.setFeatureState({ source: "fp", id: it.id }, { hover: on });
+  it.el.classList.toggle("hl", on);
+  it.hl = on; drawLeaders();
+}
+
+function screenPoly(it) { return (it.corners || [it.at]).map(c => map.project(c)); }
+
+// Place each card in the best free spot around its footprint: not over other cards,
+// other photo anchors or the info box; on screen; preferably over water; and close to where it was.
+function layout() {
+  const W = mapEl.clientWidth, H = mapEl.clientHeight, z = map.getZoom();
+  const nr = document.querySelector(".note").getBoundingClientRect();
+  const obstacles = [{ x0: nr.left - 8, y0: nr.top - 8, x1: nr.right + 8, y1: nr.bottom + 8 }];
+  const fps = ITEMS.map(it => {
+    const p = screenPoly(it), b = bbox(p);
+    if (it.at) { b.x0 -= 12; b.y0 -= 12; b.x1 += 12; b.y1 += 12; }
+    return { it, p, b };
+  });
+  const placed = [];
+  const order = [...fps].sort((a, b) => ov(a.b, a.b) - ov(b.b, b.b));   // small footprints pick first
+  for (const f of order) {
+    const it = f.it;
+    it.el.classList.remove("moving");
+    if (f.b.x1 < 0 || f.b.x0 > W || f.b.y1 < 0 || f.b.y0 > H) { it.el.style.display = "none"; it.R = null; continue; }
+    const w = lerp(z, 11, 15, 78, 210) * (it.kind === "drawing" ? 1.1 : 1);
+    const ih = Math.min(w / it.aspect, w * 1.2);
+    const cap = w >= 120 ? 19 : 0, cw = w + 8, ch = ih + 8 + cap;
+    const c = map.project(it.center);
+    const a = { x: clamp(c.x, 30, W - 30), y: clamp(c.y, 30, H - 30) };
+    const fr = Math.hypot(f.b.x1 - f.b.x0, f.b.y1 - f.b.y0) / 2, half = Math.hypot(cw, ch) / 2;
+    const radii = [fr + half * .8 + 14, fr + half * .8 + 70, fr + half * .8 + 150];
+    if (fr > 150) radii.push(fr * .3, fr * .6);
+    let best = null;
+    for (const r of radii) for (let k = 0; k < 16; k++) {
+      const ang = k * Math.PI / 8, x = a.x + Math.cos(ang) * r, y = a.y + Math.sin(ang) * r;
+      const R = { x0: x - cw / 2, y0: y - ch / 2, x1: x + cw / 2, y1: y + ch / 2 }, A = cw * ch;
+      let s = 0;
+      for (const p of placed) s += ov(R, p) / A * 100;
+      for (const o of obstacles) s += ov(R, o) / A * 100;
+      for (const g of fps) if (g !== f) s += ov(R, g.b) / A * (g.it.at ? 60 : 6);
+      s += (1 - ov(R, { x0: 8, y0: 8, x1: W - 8, y1: H - 8 }) / A) * 150;
+      s -= waterShare(R, W, H) * 12;
+      s += r * .03;
+      if (it.off && Math.hypot(x - c.x - it.off.dx, y - c.y - it.off.dy) < 40) s -= 6;   // stay put if still good
+      if (!best || s < best.s) best = { s, R, x, y };
+    }
+    if (placed.reduce((t, p) => t + ov(best.R, p), 0) / (cw * ch) > .2) { it.el.style.display = "none"; it.R = null; continue; }
+    placed.push(best.R);
+    it.off = { dx: best.x - c.x, dy: best.y - c.y }; it.R = best.R; it.cw = cw; it.ch = ch;
+    Object.assign(it.el.style, { display: "", left: best.R.x0 + "px", top: best.R.y0 + "px", width: w + "px" });
+    it.el.querySelector("img").style.height = ih + "px";
+    it.el.querySelector(".cap").style.display = cap ? "" : "none";
+  }
+  drawLeaders();
+}
+function waterShare(R, W, H) {
+  if (!waterLayers.length) return 0;
+  const pts = [[(R.x0 + R.x1) / 2, (R.y0 + R.y1) / 2], [R.x0 + 6, R.y0 + 6], [R.x1 - 6, R.y0 + 6], [R.x0 + 6, R.y1 - 6], [R.x1 - 6, R.y1 - 6]];
+  let n = 0;
+  for (const [x, y] of pts) if (x > 0 && y > 0 && x < W && y < H && map.queryRenderedFeatures([x, y], { layers: waterLayers }).length) n++;
+  return n / pts.length;
+}
+// While panning/zooming, cards ride along with their footprint; they re-settle on moveend.
+function follow() {
+  for (const it of ITEMS) {
+    if (!it.R) continue;
+    const c = map.project(it.center), x = c.x + it.off.dx, y = c.y + it.off.dy;
+    it.R = { x0: x - it.cw / 2, y0: y - it.ch / 2, x1: x + it.cw / 2, y1: y + it.ch / 2 };
+    it.el.classList.add("moving");
+    it.el.style.left = it.R.x0 + "px"; it.el.style.top = it.R.y0 + "px";
+  }
+  drawLeaders();
+}
+function drawLeaders() {
+  let out = "";
+  for (const it of ITEMS) {
+    if (!it.R) continue;
+    const poly = screenPoly(it), cc = { x: (it.R.x0 + it.R.x1) / 2, y: (it.R.y0 + it.R.y1) / 2 };
+    if (!it.at && inPoly(cc, poly)) continue;          // card sits inside its own footprint: no line needed
+    const end = it.at ? poly[0] : nearestOnPoly(cc, poly), start = nearestOnRect(end, it.R);
+    out += `<g class="${it.hl ? "hl" : ""}"><line x1="${start.x}" y1="${start.y}" x2="${end.x}" y2="${end.y}"/>${it.at ? "" : `<circle cx="${end.x}" cy="${end.y}" r="3.5"/>`}</g>`;
+  }
+  svg.innerHTML = out;
+}
+
+// ---------- drop a drawing into its place on the map, and lift it back ----------
+function cardMatrix(it, w0, h0) {
+  const r = it.el.querySelector("img").getBoundingClientRect(), o = cardsEl.getBoundingClientRect();
+  return `matrix(${r.width / w0},0,0,${r.height / h0},${r.left - o.left},${r.top - o.top})`;
+}
+function groundMatrix(it, w0, h0) {
+  const [p0, p1, , p3] = it.corners.map(c => map.project(c));
+  return `matrix(${(p1.x - p0.x) / w0},${(p1.y - p0.y) / w0},${(p3.x - p0.x) / h0},${(p3.y - p0.y) / h0},${p0.x},${p0.y})`;
+}
+async function togglePlace(it) {
+  if (busy) return; busy = true;
+  const w0 = it.img.naturalWidth, h0 = it.img.naturalHeight, lifting = it.placed;
+  const fly = new Image(); fly.src = it.cropped; fly.className = "fly";
+  Object.assign(fly.style, { width: w0 + "px", height: h0 + "px", transform: lifting ? groundMatrix(it, w0, h0) : cardMatrix(it, w0, h0) });
+  cardsEl.appendChild(fly);
+  await fly.decode();
+  if (lifting) map.setPaintProperty(it.id + "-orig", "raster-opacity", 0);
+  else it.el.querySelector("img").style.visibility = "hidden";
+  fly.getBoundingClientRect();
+  fly.style.transition = "transform .65s cubic-bezier(.2,.8,.2,1)";
+  fly.style.transform = lifting ? cardMatrix(it, w0, h0) : groundMatrix(it, w0, h0);
+  await new Promise(r => fly.addEventListener("transitionend", r, { once: true }));
+  it.placed = !lifting;
+  if (it.placed) {
+    map.setPaintProperty(it.id + "-orig", "raster-opacity", 1);
+    it.el.classList.add("placed");
+  } else {
+    it.el.classList.remove("placed");
+    applyMode();
+  }
+  it.el.querySelector("img").style.visibility = "";
+  setTimeout(() => { fly.remove(); busy = false; }, 120);
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape") ITEMS.filter(i => i.placed).forEach(togglePlace); });
+
+function applyMode() {
+  for (const it of ITEMS.filter(i => i.kind === "drawing" && !i.placed))
+    map.setPaintProperty(it.id + "-orig", "raster-opacity", mode === "faint" ? .3 : 0);
+}
+document.querySelectorAll("[name=mode]").forEach(r => r.onchange = () => { mode = r.value; applyMode(); });
+
+const lb = document.getElementById("lb");
+function lightbox(it) { lb.querySelector("img").src = it.src; lb.querySelector("figcaption").textContent = it.title; lb.classList.add("open"); }
+lb.onclick = () => lb.classList.remove("open");
+</script>
+</body>
+</html>

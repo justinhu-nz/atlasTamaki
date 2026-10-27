@@ -1,0 +1,2074 @@
+[
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1759971788503021,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8834562,
+          174.84603
+        ],
+        [
+          -36.8834562,
+          174.8636259
+        ],
+        [
+          -36.875539,
+          174.8636259
+        ],
+        [
+          -36.875539,
+          174.84603
+        ],
+        [
+          -36.8834562,
+          174.84603
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1760096313000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "ee6afa1a-a3d2-44d1-a187-1bc724371886",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "542a4493-b6f1-4795-bf9f-2ef925234126",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1759971762698894,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.9234808,
+          174.8909362
+        ],
+        [
+          -36.9205306,
+          174.9206836
+        ],
+        [
+          -36.908143,
+          174.9187616
+        ],
+        [
+          -36.9110938,
+          174.8890141
+        ],
+        [
+          -36.9234808,
+          174.8909362
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1760005471000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "d87a15f9-ae4e-4ec5-b64e-c8e05a8b8819",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "2c522733-c719-4908-9b52-97bd10f355e1",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760778478161376,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.9003553,
+          174.7371446
+        ],
+        [
+          -36.9003553,
+          174.7566367
+        ],
+        [
+          -36.8912596,
+          174.7566367
+        ],
+        [
+          -36.8912596,
+          174.7371446
+        ],
+        [
+          -36.9003553,
+          174.7371446
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036789000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "1d82db7f-bcf0-4c25-bd59-ea5b05464a10",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "ccb46413-dd99-45bb-8b3f-69de0f68de44",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760096062650577,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.9129851,
+          174.8394242
+        ],
+        [
+          -36.9234029,
+          174.841819
+        ],
+        [
+          -36.9222727,
+          174.8495114
+        ],
+        [
+          -36.9118547,
+          174.8471166
+        ],
+        [
+          -36.9129851,
+          174.8394242
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1760130096000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "ff026185-7fc4-4fe2-ac86-c47704f0b3b3",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "d4cb9028-059c-4f84-b977-efcaa6484879",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760096218464224,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8682255,
+          174.8029718
+        ],
+        [
+          -36.8682255,
+          174.8189871
+        ],
+        [
+          -36.8598349,
+          174.8189871
+        ],
+        [
+          -36.8598349,
+          174.8029718
+        ],
+        [
+          -36.8682255,
+          174.8029718
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1760096225000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "50d511b5-83f5-40bc-8c0c-b3a3574b4a12",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "cd2b1115-f559-44fe-bf26-6f946733d73a",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760096108401122,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.9059313,
+          174.8410133
+        ],
+        [
+          -36.9059313,
+          174.8608512
+        ],
+        [
+          -36.8937359,
+          174.8608512
+        ],
+        [
+          -36.8937359,
+          174.8410133
+        ],
+        [
+          -36.9059313,
+          174.8410133
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036805000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "5753bfc5-f8fe-455e-89e9-db20385fc20a",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "7dcfd5c8-1959-4a8f-82bb-09c9b797ed87",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760096429832406,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8908072,
+          174.7921952
+        ],
+        [
+          -36.8908072,
+          174.7967065
+        ],
+        [
+          -36.8881797,
+          174.7967065
+        ],
+        [
+          -36.8881797,
+          174.7921952
+        ],
+        [
+          -36.8908072,
+          174.7921952
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1760096464000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "2696f86d-e84d-44e6-a537-c54352d78bfe",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "389657a7-1701-4117-aab3-dd4ed7ba0d7b",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760096466584507,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8584731,
+          174.7718183
+        ],
+        [
+          -36.8584731,
+          174.7888086
+        ],
+        [
+          -36.8493915,
+          174.7888086
+        ],
+        [
+          -36.8493915,
+          174.7718183
+        ],
+        [
+          -36.8584731,
+          174.7718183
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1790923323000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "280ef070-d84a-45d3-ba7c-e0ef702b6f78",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "c418f851-31c8-4b6b-8ffd-873cd5b53f63",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760130088971751,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.9156396,
+          174.8333563
+        ],
+        [
+          -36.9156396,
+          174.8431062
+        ],
+        [
+          -36.9112624,
+          174.8431062
+        ],
+        [
+          -36.9112624,
+          174.8333563
+        ],
+        [
+          -36.9156396,
+          174.8333563
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1760130091000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "e3c9d41d-ef37-4e80-9630-64822c4396de",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "bd4e531c-44b4-4a95-ada6-43bb09fb9195",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760310968965464,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.7458314,
+          174.706394
+        ],
+        [
+          -36.7458314,
+          174.7331958
+        ],
+        [
+          -36.7313002,
+          174.7331958
+        ],
+        [
+          -36.7313002,
+          174.706394
+        ],
+        [
+          -36.7458314,
+          174.706394
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036998000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "578f4c14-d9ec-46ae-922b-f62ab3cecb2e",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "9005d3e5-1792-4b8c-afc3-e94207e1fd94",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760339424749592,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.9913594,
+          174.8499668
+        ],
+        [
+          -36.9913594,
+          174.86052
+        ],
+        [
+          -36.985516,
+          174.86052
+        ],
+        [
+          -36.985516,
+          174.8499668
+        ],
+        [
+          -36.9913594,
+          174.8499668
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1760339428000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "53c8abf4-23dd-4aea-9a26-6392f3a33c91",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "414049c8-201f-4193-a7e8-6f5c99571f01",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760006216632867,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8794576,
+          174.7454172
+        ],
+        [
+          -36.8794576,
+          174.7594188
+        ],
+        [
+          -36.8718964,
+          174.7594188
+        ],
+        [
+          -36.8718964,
+          174.7454172
+        ],
+        [
+          -36.8794576,
+          174.7454172
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036795000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "0fddfed7-2d63-470a-8b05-9fa9faf5b1c8",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "3b0bb232-0cb7-4d02-95af-5129e8933bbf",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760340307216494,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8904691,
+          174.7504723
+        ],
+        [
+          -36.8904691,
+          174.7637828
+        ],
+        [
+          -36.882758,
+          174.7637828
+        ],
+        [
+          -36.882758,
+          174.7504723
+        ],
+        [
+          -36.8904691,
+          174.7504723
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036785000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "8a025f67-f4ba-4a14-9074-978fcb05cfbc",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "8a9979c4-d4b6-4165-b0b5-fe74f95ed68e",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760339077481336,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.9948665,
+          174.8764101
+        ],
+        [
+          -36.9948665,
+          174.8810716
+        ],
+        [
+          -36.9923035,
+          174.8810716
+        ],
+        [
+          -36.9923035,
+          174.8764101
+        ],
+        [
+          -36.9948665,
+          174.8764101
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1760339091000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "bf21c6ce-efd2-4634-8852-9c7fb41af2d2",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "b3cfe633-1160-4a69-b897-187fe48cfdb6",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760339606126413,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8074459,
+          174.666382
+        ],
+        [
+          -36.8074459,
+          174.6954877
+        ],
+        [
+          -36.7899661,
+          174.6954877
+        ],
+        [
+          -36.7899661,
+          174.666382
+        ],
+        [
+          -36.8074459,
+          174.666382
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1760339614000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "5a7c24fc-0063-4b2a-9a0a-d0695e08f3dd",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "59f3e533-aad9-429a-8891-6e1fa9299cf2",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760339077481236,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.9928816,
+          174.8741004
+        ],
+        [
+          -36.9928816,
+          174.8812961
+        ],
+        [
+          -36.9896487,
+          174.8812961
+        ],
+        [
+          -36.9896487,
+          174.8741004
+        ],
+        [
+          -36.9928816,
+          174.8741004
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1760339093000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "00a1134c-c807-46c8-ac16-f63966ab2efd",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "05e98e73-e130-4df8-a4f6-910c651e97d5",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760340307216594,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8884068,
+          174.7412407
+        ],
+        [
+          -36.8884068,
+          174.7525761
+        ],
+        [
+          -36.8848256,
+          174.7525761
+        ],
+        [
+          -36.8848256,
+          174.7412407
+        ],
+        [
+          -36.8884068,
+          174.7412407
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036785000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "0ce20b67-47a8-4950-98c1-45cadc4f9d05",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "510665d8-1c0a-4642-a3fe-ffeca20df002",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760585649618311,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.9469712,
+          174.8383544
+        ],
+        [
+          -36.9261618,
+          174.8339652
+        ],
+        [
+          -36.9276498,
+          174.8229242
+        ],
+        [
+          -36.9484589,
+          174.8273134
+        ],
+        [
+          -36.9469712,
+          174.8383544
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1760585657000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "538f3f16-3782-4092-9c0a-b814d3192421",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "8dcd1fb0-8599-4841-a9a9-e6313883b7cb",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760779534101817,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.7647296,
+          174.7287032
+        ],
+        [
+          -36.7647296,
+          174.7445967
+        ],
+        [
+          -36.757541,
+          174.7445967
+        ],
+        [
+          -36.757541,
+          174.7287032
+        ],
+        [
+          -36.7647296,
+          174.7287032
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036993000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "a4a94d4b-647f-47d2-a2d1-77dc521f0d2b",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "6f3f2b6c-3f14-49ed-8d0c-008279463745",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760778478161476,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8854865,
+          174.6984089
+        ],
+        [
+          -36.8854865,
+          174.7142921
+        ],
+        [
+          -36.8739401,
+          174.7142921
+        ],
+        [
+          -36.8739401,
+          174.6984089
+        ],
+        [
+          -36.8854865,
+          174.6984089
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1760778502000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "14b01a3c-5c37-4c21-92ad-9bd20096a70f",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "2926c09c-d35a-4817-bf24-b88c4c3a6ad2",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760338934312682,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.7784811,
+          174.7309038
+        ],
+        [
+          -36.7784811,
+          174.7576255
+        ],
+        [
+          -36.7711895,
+          174.7576255
+        ],
+        [
+          -36.7711895,
+          174.7309038
+        ],
+        [
+          -36.7784811,
+          174.7309038
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036987000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "af7373d7-b0bb-44e9-9c0a-6c3cea0c2a9c",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "6adb0f42-19ed-46ea-bccb-07ed4ae3911a",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760581381190071,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8779224,
+          174.7315082
+        ],
+        [
+          -36.8779224,
+          174.7416666
+        ],
+        [
+          -36.8717013,
+          174.7416666
+        ],
+        [
+          -36.8717013,
+          174.7315082
+        ],
+        [
+          -36.8779224,
+          174.7315082
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036776000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "5e1809c0-4a17-4140-84dc-1d52b0e7317f",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "1df980cd-8420-49ad-a349-9da2624a3adc",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 0.87,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1761035786764864,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -37.0812685,
+          174.8713516
+        ],
+        [
+          -37.0808256,
+          174.9790001
+        ],
+        [
+          -37.0072176,
+          174.9785245
+        ],
+        [
+          -37.0076609,
+          174.870876
+        ],
+        [
+          -37.0812685,
+          174.8713516
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036432000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "385b902f-0243-4f2a-b0b3-74c50d55b393",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "45429dac-895d-4985-b8f0-ee5a6ca2e6a7",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760006386623373,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8198849,
+          174.7380932
+        ],
+        [
+          -36.8198849,
+          174.7648697
+        ],
+        [
+          -36.8130119,
+          174.7648697
+        ],
+        [
+          -36.8130119,
+          174.7380932
+        ],
+        [
+          -36.8198849,
+          174.7380932
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036981000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "542fd7ef-e15f-4af2-8945-6ac05c8db730",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "5df7e72a-0d87-460c-8b75-6858d24f489b",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1760006073606046,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8620248,
+          174.7541733
+        ],
+        [
+          -36.8620248,
+          174.76898
+        ],
+        [
+          -36.855355,
+          174.76898
+        ],
+        [
+          -36.855355,
+          174.7541733
+        ],
+        [
+          -36.8620248,
+          174.7541733
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1761036765000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "a8bf5e21-3fba-4941-a484-c3b38eb8fa16",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "ef4655dc-ce4c-4720-82b3-ead244795adb",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1790923315861140,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8511604,
+          174.7555657
+        ],
+        [
+          -36.8511604,
+          174.7723382
+        ],
+        [
+          -36.8432406,
+          174.7723382
+        ],
+        [
+          -36.8432406,
+          174.7555657
+        ],
+        [
+          -36.8511604,
+          174.7555657
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": false,
+    "description": null,
+    "createdAtUnixTimeMs": 1790923331000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "3c92c085-8a09-43b3-9af3-26eee5ce60c2",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "ad92c9b2-7401-495b-a84e-7254ce26c9d5",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1790923315861040,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8435682,
+          174.7689914
+        ],
+        [
+          -36.8435682,
+          174.7861766
+        ],
+        [
+          -36.8354411,
+          174.7861766
+        ],
+        [
+          -36.8354411,
+          174.7689914
+        ],
+        [
+          -36.8435682,
+          174.7689914
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1790923368000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "c3d278a1-2d6e-4580-925a-a086060191f0",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "9553d24c-bf8f-4bf5-938a-b60cb5463bac",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  },
+  {
+    "radiusDisplayUnit": null,
+    "strokeStyle": null,
+    "frame": null,
+    "opacity": 1,
+    "strokeWidth": null,
+    "position": null,
+    "showLinkPreview": null,
+    "ordering": 1790923306728657,
+    "size": null,
+    "attributes": [],
+    "showEndcaps": null,
+    "label": null,
+    "textStyle": null,
+    "scale": null,
+    "widthScale": 1,
+    "symbol": null,
+    "showArea": null,
+    "coordinates": [
+      [
+        [
+          -36.8432569,
+          174.7526317
+        ],
+        [
+          -36.8432569,
+          174.7690314
+        ],
+        [
+          -36.8354476,
+          174.7690314
+        ],
+        [
+          -36.8354476,
+          174.7526317
+        ],
+        [
+          -36.8432569,
+          174.7526317
+        ]
+      ]
+    ],
+    "isCollapsed": null,
+    "renderHoles": null,
+    "radius": null,
+    "parentId": null,
+    "locked": false,
+    "isTextHidden": null,
+    "color": "#C93535",
+    "hideFromLegend": null,
+    "clipSource": null,
+    "showLength": null,
+    "rotation": null,
+    "hasLongDescription": null,
+    "description": null,
+    "createdAtUnixTimeMs": 1790923350000,
+    "isHidden": null,
+    "icon": null,
+    "onClick": null,
+    "radiusDisplayAngle": 90,
+    "id": "052061e6-6840-410c-ba02-dc12b4489276",
+    "routeMode": null,
+    "showRadius": null,
+    "zoom": null,
+    "mapLinkId": null,
+    "type": "Image",
+    "author": "83518b79-cf82-4646-994e-9e6e1eb01a0f",
+    "mapImageId": "07bf964e-5f02-4347-8d56-eaebffc4dea8",
+    "textAlign": null,
+    "fillOpacity": null,
+    "strokeOpacity": null,
+    "text": "",
+    "isochrone": null
+  }
+]

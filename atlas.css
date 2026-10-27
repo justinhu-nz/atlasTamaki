@@ -1,0 +1,44 @@
+/* Stickers, shared by the viewer and the editor. */
+#layer { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:2; }
+#ties { position:absolute; inset:0; width:100%; height:100%; }
+#ties path { fill:none; stroke:#1d2228; stroke-width:1.3; opacity:.5; }
+#ties circle { fill:#1d2228; stroke:#fff; stroke-width:1.5; }
+.st { position:absolute; left:0; top:0; width:0; height:0; visibility:hidden; pointer-events:auto; cursor:pointer; background:#fff; padding:4px; border-radius:6px;
+  border:3px solid var(--c); box-sizing:border-box; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+.st img { width:100%; height:100%; object-fit:cover; display:block; border-radius:3px; pointer-events:none; }
+.st .lbl { position:absolute; left:50%; top:100%; transform:translate(-50%,5px); background:#fff; font-size:11px; font-weight:600; line-height:1.5; color:#1d2228;
+  padding:1px 7px; border-radius:4px; white-space:nowrap; max-width:180px; overflow:hidden; text-overflow:ellipsis; box-shadow:0 1px 3px rgba(0,0,0,.2); pointer-events:none; }
+.st.sel { outline:3px solid #1d2228; outline-offset:2px; }
+.st.overview { padding:1px; border-width:1.5px; border-radius:2px; }
+.st.overview img { border-radius:0; }
+.st.overview .lbl { display:none; }
+.st.overview:hover .lbl, .st.overview:focus .lbl, .st.overview.sel .lbl { display:block; }
+/* The viewer lets MapLibre handle touch gestures beginning on an image. */
+#map #layer .st { touch-action:none; user-select:none; -webkit-user-select:none; }
+.basemap-control { font:13px/1.4 system-ui,sans-serif; color:#1d2228; background:#fff; border-radius:9px; box-shadow:0 2px 10px #0002; }
+.basemap-control summary { padding:9px 12px; cursor:pointer; font-weight:600; list-style:none; }
+.basemap-control summary::-webkit-details-marker { display:none; }
+.basemap-control summary:focus-visible { outline:2px solid #1c7ed6; outline-offset:2px; }
+.basemap-control fieldset { border:0; border-top:1px solid #e3e6ea; padding:8px; margin:0; display:grid; grid-template-columns:repeat(2, 1fr); gap:6px; width:220px; }
+.basemap-control legend { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+.basemap-control label { display:flex; align-items:center; gap:6px; cursor:pointer; margin:0; padding:5px; border:1px solid transparent; border-radius:5px; font-weight:500; }
+.basemap-control label:has(input:checked) { background:#edf5fb; border-color:#6b9ec8; }
+.basemap-control input { position:absolute; opacity:0; width:1px; height:1px; }
+.basemap-control label:has(input:focus-visible) { outline:2px solid #1c7ed6; }
+.basemap-control .basemap-swatch { width:28px; height:28px; flex:none; border-radius:4px; background:linear-gradient(130deg,transparent 43%,#fff 44% 51%,transparent 52%),linear-gradient(30deg,#e5e8e9 50%,#c4dce4 51%); }
+.basemap-control .streets { background:linear-gradient(130deg,transparent 43%,#f5d592 44% 51%,transparent 52%),linear-gradient(30deg,#dce8cc 50%,#a7cee0 51%); }
+.basemap-control .bright { background:linear-gradient(130deg,transparent 43%,#fff 44% 51%,transparent 52%),linear-gradient(30deg,#f5e8ca 50%,#83c9e5 51%); }
+.basemap-control .dark { background:linear-gradient(130deg,transparent 43%,#74818d 44% 51%,transparent 52%),linear-gradient(30deg,#29343d 50%,#17232e 51%); }
+.basemap-control .satellite { background:linear-gradient(130deg,transparent 43%,#9eab8b 44% 47%,transparent 48%),linear-gradient(30deg,#43563e 50%,#203e4a 51%); }
+.basemap-control .basemap-labels { border-top:1px solid #e3e6ea; border-radius:0; padding:10px 12px; }
+.basemap-control .basemap-labels input { position:static; opacity:1; width:16px; height:16px; margin:0 4px 0 0; accent-color:#1c7ed6; }
+.basemap-control .basemap-labels:has(input:checked) { background:transparent; border-color:#e3e6ea; }
+.basemap-control .basemap-status { margin:0; padding:2px 12px 10px; max-width:220px; font-size:12px; }
+.transport-control { font:13px/1.4 system-ui,sans-serif; color:#1d2228; background:#fff; border-radius:9px; box-shadow:0 2px 10px #0002; }
+.transport-control summary { padding:9px 12px; cursor:pointer; font-weight:600; list-style:none; }
+.transport-control summary::-webkit-details-marker { display:none; }
+.transport-control label { display:flex; align-items:center; gap:7px; padding:12px; margin:0; border-top:1px solid #e3e6ea; font-weight:600; cursor:pointer; }
+.transport-control input { width:16px; height:16px; margin:0; accent-color:#283745; }
+.transport-control .rail-key { width:22px; height:4px; background:repeating-linear-gradient(90deg,#283745 0 5px,#fff 5px 7px); border-block:1px solid #283745; }
+.transport-control p { margin:0; padding:0 12px 8px; color:#5f6b76; font-size:12px; }
+.transport-control a { display:block; padding:0 12px 12px; color:#406b8f; font-size:11px; }

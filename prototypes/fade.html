@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype: Faded overlay</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="proto.js"></script>
+<link rel="stylesheet" href="proto.css">
+<style>
+  .tag { background:#1d2228; color:#fff; font-size:12px; padding:3px 8px; border-radius:6px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="note">
+  <b>Faded until hovered</b>: the figure rests faintly and comes up when you point at it. Click it to keep it up.
+  <label>Resting opacity <input id="rest" type="range" min="0" max="0.6" step="0.05" value="0.2"></label>
+  <span id="state" style="color:#5f6b76;font-size:12px">State: resting</span>
+  <nav><a href="lens.html">Lens</a> · <a href="side.html">Side by side</a> · <a href="fade.html">Faded until hovered</a></nav>
+</div>
+<script>
+const map = new maplibregl.Map({ container: "map", style: STYLE, ...VIEW });
+const rest = document.getElementById("rest"), state = document.getElementById("state");
+const tagEl = document.createElement("div"); tagEl.className = "tag"; tagEl.textContent = OVERLAY.caption;
+const tag = new maplibregl.Marker({ element: tagEl, anchor: "bottom" }).setLngLat([(OVERLAY.corners[0][0] + OVERLAY.corners[1][0]) / 2, OVERLAY.corners[0][1]]);
+let hovering = false, pinned = false;
+
+function update() {
+  const up = hovering || pinned;
+  map.setPaintProperty("ov", "raster-opacity", up ? 0.9 : +rest.value);
+  map.setPaintProperty("ov-outline", "line-opacity", up ? 1 : 0.4);
+  up ? tag.addTo(map) : tag.remove();
+  state.textContent = "State: " + (pinned ? "kept up (click outside to release)" : hovering ? "hovered" : "resting");
+}
+map.on("load", () => { addOverlay(map, +rest.value); addOutline(map); });
+map.on("mousemove", e => {
+  const h = inside(toFrac([e.lngLat.lng, e.lngLat.lat]));
+  if (h !== hovering) { hovering = h; map.getCanvas().style.cursor = h ? "pointer" : ""; update(); }
+});
+map.getCanvas().addEventListener("mouseleave", () => { hovering = false; update(); });
+// Touch has no hover, so tapping toggles it.
+map.on("click", e => { pinned = inside(toFrac([e.lngLat.lng, e.lngLat.lat])) ? !pinned : false; update(); });
+rest.oninput = update;
+</script>
+</body>
+</html>

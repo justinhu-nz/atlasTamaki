@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype: Lens</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="proto.js"></script>
+<link rel="stylesheet" href="proto.css">
+<style>
+  /* Second map on top shows the figure; it's clipped to a circle around the pointer. */
+  #lensMap { position:absolute; inset:0; pointer-events:none; clip-path:circle(0 at 50% 50%); }
+  #ring { position:absolute; border:3px solid #fff; border-radius:50%; box-shadow:0 0 0 1px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3); pointer-events:none; display:none; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="lensMap"></div>
+<div id="ring"></div>
+<div class="note">
+  <b>Lens</b>: move over the dashed area to see the figure through the lens.
+  <label>Size <input id="size" type="range" min="80" max="400" value="170"></label>
+  <label><input id="lock" type="checkbox"> Freeze lens (click map to place)</label>
+  <nav><a href="lens.html">Lens</a> · <a href="side.html">Side by side</a> · <a href="fade.html">Faded until hovered</a></nav>
+</div>
+<script>
+const map = new maplibregl.Map({ container: "map", style: STYLE, ...VIEW });
+const lens = new maplibregl.Map({ container: "lensMap", style: STYLE, ...VIEW, interactive: false, attributionControl: false });
+map.on("load", addOutline.bind(null, map));
+lens.on("load", () => addOverlay(lens, 1));
+map.on("move", () => lens.jumpTo({ center: map.getCenter(), zoom: map.getZoom(), bearing: map.getBearing() }));
+
+const el = document.getElementById("lensMap"), ring = document.getElementById("ring");
+const size = document.getElementById("size"), lock = document.getElementById("lock");
+let last = null;
+function place(pt) {
+  last = pt;
+  const r = +size.value / 2;
+  el.style.clipPath = `circle(${r}px at ${pt.x}px ${pt.y}px)`;
+  Object.assign(ring.style, { display: "block", left: pt.x - r + "px", top: pt.y - r + "px", width: 2*r + "px", height: 2*r + "px" });
+}
+function hide() { el.style.clipPath = "circle(0 at 50% 50%)"; ring.style.display = "none"; }
+map.on("mousemove", e => {
+  if (lock.checked) return;
+  inside(toFrac([e.lngLat.lng, e.lngLat.lat])) ? place(e.point) : hide();
+});
+map.getCanvas().addEventListener("mouseleave", () => { if (!lock.checked) hide(); });
+map.on("click", e => { if (lock.checked) place(e.point); });
+// Touch: lens follows the finger while dragging.
+map.on("touchmove", e => { if (!lock.checked) place(e.point); });
+map.on("touchend", () => { if (!lock.checked) hide(); });
+size.oninput = () => last && place(last);
+</script>
+</body>
+</html>

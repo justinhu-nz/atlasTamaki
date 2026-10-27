@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sticker variations</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="items.js"></script>
+<link rel="stylesheet" href="proto.css">
+<style>
+  #layer { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  #tethers { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  #tethers line { stroke:#1d2228; stroke-width:1.2; opacity:.45; }
+  #tethers circle { fill:#1d2228; stroke:#fff; stroke-width:1.5; }
+
+  .st { position:absolute; pointer-events:auto; cursor:pointer; background:#fff; padding:4px; box-sizing:border-box;
+    border-radius:6px; box-shadow:0 3px 10px rgba(0,0,0,.28); transition:box-shadow .2s, opacity .2s; }
+  .st img { width:100%; height:100%; object-fit:cover; display:block; border-radius:3px; pointer-events:none; }
+  .st:hover { box-shadow:0 8px 22px rgba(0,0,0,.38); z-index:60 !important; }
+  .st.fanning { transition:transform .25s, box-shadow .2s; }
+  /* Die-cut shapes: thick white edge like a vinyl sticker */
+  .st.circle, .st.circle img { border-radius:50%; }
+  .st.pill, .st.pill img { border-radius:999px; }
+  .st.cut { padding:5px; }
+  /* Peeling corner on hover */
+  .st::after { content:""; position:absolute; right:0; bottom:0; width:0; height:0; border-radius:0 0 6px 0;
+    background:linear-gradient(135deg, transparent 50%, #e9e9e6 50%, #fff 70%); box-shadow:-2px -2px 4px rgba(0,0,0,.15); transition:width .15s, height .15s; }
+  .st:not(.circle):not(.pill):hover::after { width:16px; height:16px; }
+  .st .n { position:absolute; top:-8px; right:-8px; background:#1d2228; color:#fff; font-size:11px; font-weight:700; padding:1px 7px; border-radius:999px; }
+  .st .lbl { position:absolute; left:50%; top:100%; transform:translate(-50%,5px); background:#fff; color:#1d2228; font-size:11px; font-weight:600;
+    padding:1px 7px; border-radius:4px; white-space:nowrap; box-shadow:0 1px 3px rgba(0,0,0,.2); pointer-events:none; }
+  .st.sel { outline:3px solid #1c7ed6; outline-offset:2px; }
+
+  /* Image laid on the map at true scale */
+  .laid { position:absolute; pointer-events:none; box-shadow:0 1px 6px rgba(0,0,0,.3); }
+  .laid img { width:100%; height:100%; object-fit:fill; display:block; }
+  .laid.anim { transition:width .6s cubic-bezier(.2,.8,.2,1), height .6s cubic-bezier(.2,.8,.2,1), transform .6s cubic-bezier(.2,.8,.2,1); }
+
+  #detail { position:absolute; top:0; right:0; bottom:0; width:340px; background:#fff; box-shadow:-2px 0 12px rgba(0,0,0,.18); z-index:70;
+    transform:translateX(105%); transition:transform .25s; overflow:auto; }
+  #detail.open { transform:none; }
+  #detail .in { padding:16px 18px; }
+  #detail img { width:100%; border-radius:6px; display:block; }
+  #detail h2 { font-size:19px; margin:12px 0 4px; }
+  #detail .credit { color:#5f6b76; font-size:12px; margin-bottom:12px; }
+  #detail button { font:inherit; padding:8px 12px; border-radius:8px; border:1px solid #ccd; background:#f6f7f9; cursor:pointer; margin:0 6px 8px 0; }
+  #detail button.on { background:#1c7ed6; color:#fff; border-color:#1c7ed6; }
+  #detail .x { position:absolute; top:10px; right:10px; border:0; background:#f1f3f5; width:30px; height:30px; border-radius:50%; padding:0; margin:0; }
+  .note select { font:inherit; }
+  @media (max-width:700px) { #detail { top:auto; width:100%; height:62%; transform:translateY(105%); } }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="layer"><svg id="tethers"></svg></div>
+<aside id="detail"><div class="in" id="detailIn"></div></aside>
+<div class="note">
+  <span><b>Sticker variations</b>: images show as stickers by default. True map scale is a toggle in the detail view (click a sticker).</span>
+  <label>Style
+    <select id="variant">
+      <option value="pinboard">1 · Pinboard: one size, slight tilt</option>
+      <option value="hierarchy">2 · Hierarchy: bigger ideas, bigger stickers</option>
+      <option value="diecut">3 · Die-cut: shape by type</option>
+      <option value="physics" selected>4 · Jostle: stickers push apart, tethered</option>
+    </select>
+  </label>
+  <label>When they crowd
+    <select id="stack">
+      <option value="fan">Stack, fan out on hover</option>
+      <option value="badge">Stack with +n count</option>
+    </select>
+  </label>
+  <label>Size <input id="size" type="range" min="44" max="150" value="84"></label>
+  <label><input id="labels" type="checkbox" checked> Show titles</label>
+  <nav><a href="stickers.html">Sticker variations</a> · <a href="a-stickers.html">A</a> · <a href="b-tiles.html">B</a> · <a href="c-editor.html">C · Editor</a></nav>
+</div>
+<script>
+const map = newMap(), layer = document.getElementById("layer"), tethers = document.getElementById("tethers");
+const $ = id => document.getElementById(id);
+const opt = { variant: "physics", stack: "fan", S: 84, labels: true };
+let selected = null, fanned = null, fanTimer = null, lastKey = "";
+// Stickers are placed inside the map's own render, so they move in the same frame as the map.
+// Anything else that changes them asks the map for one more frame.
+const redraw = () => { lastKey = ""; map.triggerRepaint(); };
+
+const tiltOf = it => (rng(it.id)() - .5) * 6;
+const shapeOf = it => it.kind === "photo" ? "circle" : (it.aspect > 1.8 || it.aspect < .55) ? "pill" : "rounded";
+const weightOf = it => clamp((Math.log2(it.wm) - 8) / 5, 0, 1);      // 0 = a single station, 1 = a whole corridor
+
+loadItems().then(items => {
+  for (const it of items) {
+    it.el = document.createElement("div");
+    it.el.className = "st";
+    it.el.innerHTML = `<img src="${it.src}" alt=""><span class="n" hidden></span><span class="lbl" hidden>${it.title}</span>`;
+    it.el.onclick = e => { e.stopPropagation(); select(it); };
+    it.el.onmouseenter = () => { clearTimeout(fanTimer); if (it.members?.length && opt.stack === "fan") fanned = it; else if (!it.fanOf) fanned = null; redraw(); };
+    it.el.onmouseleave = () => { fanTimer = setTimeout(() => { fanned = null; redraw(); }, 250); };
+    layer.appendChild(it.el);
+  }
+  map.on("render", frame);
+  redraw();
+});
+for (const k of ["variant", "stack", "size", "labels"]) $(k).oninput = () => {
+  opt.variant = $("variant").value; opt.stack = $("stack").value; opt.S = +$("size").value; opt.labels = $("labels").checked;
+  ITEMS.forEach(it => it.p = null);
+  redraw();
+};
+map.on("click", () => select(null));
+
+// ---------- sticker sizes ----------
+function stickerSize(it) {
+  const z = map.getZoom(), v = opt.variant;
+  let s = opt.S;
+  if (v === "hierarchy" || v === "physics") s *= (.65 + .8 * weightOf(it)) * 2 ** ((z - 12) * .3);
+  if (v === "diecut") {
+    const sh = shapeOf(it);
+    if (sh === "circle") return { w: s * .85, h: s * .85 };
+    if (sh === "pill") return it.aspect > 1 ? { w: s * 1.5, h: s * .62 } : { w: s * .62, h: s * 1.5 };
+    return { w: s, h: s * .8 };
+  }
+  return it.aspect >= 1 ? { w: s, h: s / it.aspect } : { w: s * it.aspect, h: s };
+}
+
+// ---------- every frame: place stickers ----------
+function frame() {
+  const v = opt.variant, c = map.getCenter();
+  // Nothing moved and nothing changed (e.g. a tile finished loading): skip the work.
+  const key = [c.lng, c.lat, map.getZoom(), innerWidth, innerHeight].join();
+  if (key === lastKey && v !== "physics") return;
+  lastKey = key;
+  let moving = 0;
+  const boxes = ITEMS.map(it => { const a = map.project(it.center), { w, h } = stickerSize(it); return { it, a, w, h }; });
+  let lines = "";
+  ITEMS.forEach(it => { it.members = []; it.fanOf = null; });
+
+  if (v === "physics") {
+    // Each sticker is pulled to its spot by a spring and pushed out of the way by its neighbours.
+    for (const b of boxes) {
+      const it = b.it;
+      if (!it.p) it.p = { x: b.a.x, y: b.a.y };
+      else if (it.pa) { it.p.x += b.a.x - it.pa.x; it.p.y += b.a.y - it.pa.y; }
+      it.pa = b.a;
+      it.prev = { x: it.p.x, y: it.p.y };
+      it.p.x += (b.a.x - it.p.x) * .08; it.p.y += (b.a.y - it.p.y) * .08;
+    }
+    for (let k = 0; k < 4; k++) for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+      const A = boxes[i], B = boxes[j], pa = A.it.p, pb = B.it.p;
+      const ox = (A.w + B.w) / 2 + 6 - Math.abs(pa.x - pb.x), oy = (A.h + B.h) / 2 + 6 + (opt.labels ? 20 : 0) - Math.abs(pa.y - pb.y);   // leave room for titles
+      if (ox <= 0 || oy <= 0) continue;
+      if (ox < oy) { const s = (pa.x < pb.x ? -1 : 1) * ox / 2 * .5; pa.x += s; pb.x -= s; }
+      else { const s = (pa.y < pb.y ? -1 : 1) * oy / 2 * .5; pa.y += s; pb.y -= s; }
+    }
+    for (const b of boxes) {
+      b.x = b.it.p.x; b.y = b.it.p.y; b.show = true;
+      moving = Math.max(moving, Math.hypot(b.x - b.it.prev.x, b.y - b.it.prev.y));
+      if (Math.hypot(b.x - b.a.x, b.y - b.a.y) > 8) lines += `<line x1="${b.x}" y1="${b.y}" x2="${b.a.x}" y2="${b.a.y}"/><circle cx="${b.a.x}" cy="${b.a.y}" r="3"/>`;
+    }
+  } else {
+    // Bigger ideas claim their spot first; stickers that land on top of one join its stack.
+    boxes.sort((a, b) => b.it.wm - a.it.wm);
+    const leaders = [];
+    for (const b of boxes) {
+      b.x = b.a.x; b.y = b.a.y; b.show = true;
+      const r = aabb(b), host = leaders.find(l => overlap(r, aabb(l)) > .25 * Math.min(b.w * b.h, l.w * l.h));
+      if (host) { host.it.members.push(b); b.it.fanOf = host.it; b.show = false; }
+      else leaders.push(b);
+    }
+    // Fan a hovered stack out in an arc around it
+    if (fanned) {
+      const host = boxes.find(b => b.it === fanned);
+      if (host) host.it.members.forEach((m, i, all) => {
+        const ang = -Math.PI / 2 + (i - (all.length - 1) / 2) * .9, r = Math.max(host.w, host.h) * .95 + Math.max(m.w, m.h) * .45;
+        m.x = host.x + Math.cos(ang) * r; m.y = host.y + Math.sin(ang) * r; m.show = true; m.fan = true;
+        lines += `<line x1="${m.x}" y1="${m.y}" x2="${m.a.x}" y2="${m.a.y}"/><circle cx="${m.a.x}" cy="${m.a.y}" r="3"/>`;
+      });
+    }
+  }
+
+  for (const b of boxes) {
+    const it = b.it, el = it.el;
+    it.box = { x: b.x, y: b.y, w: b.w, h: b.h, rot: v === "pinboard" || v === "physics" ? tiltOf(it) : v === "diecut" ? tiltOf(it) * .5 : 0 };
+    el.style.display = b.show && !it.laid ? "" : "none";
+    if (el.style.display) continue;
+    place(el, it.box);
+    const sh = v === "diecut" ? shapeOf(it) : "";
+    const cls = "st" + (sh ? " cut " + sh : "") + (it === selected ? " sel" : "") + (b.fan ? " fanning" : "");
+    if (el.className !== cls) el.className = cls;
+    el.style.zIndex = b.fan ? 55 : Math.round(30 - Math.log2(it.wm));
+    const n = el.querySelector(".n"), count = it.members.length;
+    n.hidden = !count || (opt.stack === "fan" && fanned === it); n.textContent = "+" + count;
+    el.querySelector(".lbl").hidden = !opt.labels && it !== selected;
+  }
+  tethers.innerHTML = lines;
+  for (const it of ITEMS) if (it.laidEl) place(it.laidEl, it.returning ? it.box : screenBox(map, it));
+  // Jostling stickers keep animating after the map stops, until they settle.
+  if (moving > .2) map.triggerRepaint();
+}
+
+// ---------- detail view with the true-scale toggle ----------
+function select(it) {
+  selected = it;
+  redraw();
+  $("detail").classList.toggle("open", !!it);
+  if (!it) return;
+  $("detailIn").innerHTML = `
+    <button class="x" aria-label="Close">×</button>
+    <img src="${it.src}" alt="">
+    <h2>${it.title}</h2>
+    <div class="credit">${it.credit || "Credit: add source"} · about ${it.wm >= 1000 ? (it.wm / 1000).toFixed(1) + " km" : Math.round(it.wm) + " m"} across</div>
+    <button id="lay" class="${it.laid ? "on" : ""}">${it.laid ? "✓ Laid on map at true scale" : "Lay on map at true scale"}</button>
+    <button id="fit">Zoom to it</button>
+    <label id="opRow" ${it.laid ? "" : "hidden"}>See-through <input id="op" type="range" min=".2" max="1" step=".05" value="${it.op ?? .85}"></label>
+    <p style="color:#5f6b76;font-size:13px">What it is, why it matters and sources would go here.</p>`;
+  $("detailIn").querySelector(".x").onclick = () => select(null);
+  $("lay").onclick = () => { toggleLaid(it); select(it); };
+  $("fit").onclick = fit.bind(null, it);
+  $("op").oninput = e => { it.op = +e.target.value; if (it.laidEl) it.laidEl.style.opacity = it.op; };
+}
+function fit(it) {
+  const b = screenBox(map, it), target = Math.min(innerWidth - 360, innerHeight) * .7;
+  map.flyTo({ center: it.center, zoom: map.getZoom() + Math.log2(target / Math.max(b.w, b.h)), offset: [innerWidth > 700 ? -170 : 0, 0] });
+}
+// The sticker peels off and lays itself onto the ground (and back again).
+function toggleLaid(it) {
+  if (!it.laid) {
+    const el = it.laidEl = document.createElement("div");
+    el.className = "laid anim"; el.innerHTML = `<img src="${it.src}" alt="">`; el.style.opacity = it.op ?? .85;
+    place(el, it.box); layer.appendChild(el);
+    it.laid = true; it.returning = false;
+    el.getBoundingClientRect();
+    setTimeout(() => el.classList.remove("anim"), 650);
+    // If it would be tiny or off-screen at true scale, zoom to it as well
+    const b = screenBox(map, it);
+    if (Math.max(b.w, b.h) < 120 || b.x < 0 || b.y < 0 || b.x > innerWidth || b.y > innerHeight) fit(it);
+  } else {
+    const el = it.laidEl;
+    el.classList.add("anim"); it.returning = true;
+    setTimeout(() => { el.remove(); it.laidEl = null; it.laid = false; it.returning = false; redraw(); }, 620);
+  }
+  redraw();
+}
+</script>
+</body>
+</html>

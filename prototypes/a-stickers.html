@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A: Stickers</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="items.js"></script>
+<link rel="stylesheet" href="proto.css">
+<style>
+  #layer { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .im { position:absolute; pointer-events:auto; cursor:pointer; box-sizing:border-box; background:#fff;
+    transition:padding .25s, box-shadow .25s, border-radius .25s, opacity .25s; }
+  .im img { width:100%; height:100%; object-fit:cover; display:block; border-radius:inherit; }
+  /* At true map scale: flush with the ground */
+  .im.exact { padding:0; box-shadow:0 1px 4px rgba(0,0,0,.25); border-radius:2px; }
+  /* Held at minimum size: a sticker */
+  .im.stamp { padding:4px; box-shadow:0 3px 10px rgba(0,0,0,.3); border-radius:6px; }
+  .im .n { position:absolute; top:-8px; right:-8px; background:#1d2228; color:#fff; font-size:11px; font-weight:700; padding:1px 7px; border-radius:999px; }
+  .im .t { position:absolute; left:50%; top:100%; transform:translate(-50%,6px); background:#1d2228; color:#fff; font-size:12px; padding:2px 8px; border-radius:6px; white-space:nowrap; opacity:0; transition:opacity .15s; pointer-events:none; }
+  .im:hover { z-index:50 !important; opacity:1 !important; }
+  .im:hover .t { opacity:1; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="layer"></div>
+<div class="note">
+  <span><b>A · Stickers</b>: each image is entered at map scale, like Felt. Zoomed in, it sits flush on the ground. Zoomed out, it stops shrinking at a readable size and turns into a sticker. Crowded stickers stack up with a count. When you're zoomed inside a big image, it fades so the map shows through.</span>
+  <label>Minimum size <input id="min" type="range" min="40" max="140" value="76"></label>
+  <nav><a href="a-stickers.html">A · Stickers</a> · <a href="b-tiles.html">B · Tiles</a> · <a href="c-editor.html">C · Editor</a></nav>
+</div>
+<script>
+const map = newMap(), layer = document.getElementById("layer"), minEl = document.getElementById("min");
+
+loadItems().then(items => {
+  for (const it of items) {
+    it.el = document.createElement("div");
+    it.el.className = "im";
+    it.el.innerHTML = `<img src="${it.src}" alt=""><span class="n" hidden></span><span class="t">${it.title}</span>`;
+    it.el.onclick = () => {
+      // Zoom so the image fills about 60% of the screen at true scale
+      const b = screenBox(map, it), target = Math.min(innerWidth, innerHeight) * .6;
+      map.flyTo({ center: it.center, zoom: map.getZoom() + Math.log2(target / Math.max(b.w, b.h)) });
+    };
+    layer.appendChild(it.el);
+  }
+  map.on("move", render); minEl.oninput = render;
+  render();
+});
+
+function render() {
+  const W = innerWidth, H = innerHeight, MIN = +minEl.value;
+  const boxes = ITEMS.map(it => {
+    const b = screenBox(map, it), long = Math.max(b.w, b.h);
+    const k = Math.max(1, MIN / long);                          // never smaller than MIN px on its long side
+    return { it, b: { ...b, w: b.w * k, h: b.h * k }, stamp: k > 1, long };
+  });
+  // Bigger (more important) images claim space first; small stickers that collide join their stack.
+  boxes.sort((a, b) => b.it.wm - a.it.wm);
+  const stamps = [];
+  for (const x of boxes) {
+    const { it, b } = x, el = it.el;
+    x.count = 0; x.hidden = false;
+    if (x.stamp) {
+      const r = aabb(b), host = stamps.find(s => overlap(r, s.r) > .3 * Math.min(b.w * b.h, s.x.b.w * s.x.b.h));
+      if (host) { host.x.count++; x.hidden = true; }
+      else stamps.push({ x, r });
+    }
+    el.style.display = x.hidden ? "none" : "";
+    if (x.hidden) continue;
+    place(el, b);
+    el.classList.toggle("stamp", x.stamp); el.classList.toggle("exact", !x.stamp);
+    // Inside a huge image: fade it so the streets show through
+    const fill = x.long / Math.min(W, H);
+    el.style.opacity = x.stamp ? 1 : clamp(1.15 - (fill - .5) * .7, .3, .95);
+    el.style.zIndex = x.stamp ? 30 : Math.round(20 - Math.log2(it.wm));   // smaller images sit on top of bigger ones
+  }
+  for (const x of boxes) {
+    const n = x.it.el.querySelector(".n");
+    n.hidden = !x.count; n.textContent = "+" + x.count;
+  }
+}
+</script>
+</body>
+</html>

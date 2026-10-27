@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Atlas Tāmaki</title>
+<meta name="description" content="A curated map of the best ideas for Auckland's transport and streets.">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="ideas.js"></script>
+<script src="atlas.js"></script>
+<script src="basemaps.js"></script>
+<script src="data/railways.js"></script>
+<script src="transport-layers.js"></script>
+<link rel="stylesheet" href="atlas.css">
+<style>
+  :root { --bg:#fff; --fg:#1d2228; --muted:#5f6b76; --line:#e3e6ea; --chip:#f3f4f6; --accent:#1c7ed6;
+    --shadow:0 1px 4px rgba(0,0,0,.15); --shadow-lg:0 6px 24px rgba(0,0,0,.18); --panel:420px; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; overflow:hidden; font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--fg); background:var(--bg); }
+  #map { position:absolute; inset:0; }
+  body.panel-open .maplibregl-ctrl-bottom-right { right:var(--panel); }
+  button { font:inherit; color:inherit; cursor:pointer; }
+  a { color:var(--accent); }
+  :focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* Top bar */
+  #bar { position:absolute; top:12px; left:12px; right:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start; pointer-events:none; z-index:20; }
+  #bar > * { pointer-events:auto; }
+  body.panel-open #bar { right:calc(var(--panel) + 12px); }
+  .brand { background:var(--bg); padding:7px 14px; border-radius:10px; box-shadow:var(--shadow); font-weight:700; border:0; }
+  .searchbox { position:relative; }
+  #search { padding:8px 12px 8px 32px; border:0; border-radius:10px; box-shadow:var(--shadow); font:inherit; width:230px;
+    background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235f6b76' stroke-width='2'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='m11 11 4 4'/%3E%3C/svg%3E") no-repeat 10px 50%; }
+  #results { position:absolute; top:calc(100% + 6px); left:0; width:max(100%, 320px); max-height:60vh; overflow-y:auto; background:var(--bg); border-radius:10px; box-shadow:var(--shadow-lg); padding:4px; display:none; }
+  #results.open { display:block; }
+  #results button { display:grid; grid-template-columns:44px 1fr; gap:2px 10px; width:100%; text-align:left; border:0; background:none; padding:6px; border-radius:7px; }
+  #results button.on, #results button:hover { background:var(--chip); }
+  #results img { width:44px; height:34px; object-fit:cover; border-radius:4px; grid-row:span 2; }
+  #results b { font-size:14px; }
+  #results small { color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #results .none { padding:10px; color:var(--muted); font-size:14px; }
+  #chips { display:flex; gap:6px; flex-wrap:wrap; }
+  .chip { display:flex; align-items:center; gap:6px; background:var(--bg); border:0; padding:6px 12px; border-radius:999px; box-shadow:var(--shadow); font-size:13px; white-space:nowrap; }
+  .chip i { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .chip .n { color:var(--muted); font-size:12px; }
+  .chip.off { background:rgba(255,255,255,.75); color:var(--muted); }
+  .chip.off i { background:#bbb !important; }
+  .chip.reset { background:var(--fg); color:#fff; }
+  .right { margin-left:auto; display:flex; gap:8px; }
+
+  /* Stickers: base styles are in atlas.css; the hover caption is the viewer's own */
+  .st .lbl small { display:none; }
+  /* Focused: the label opens into a short caption card */
+  .st.focus .lbl { white-space:normal; width:230px; max-width:none; padding:6px 9px 7px; font-size:13px; line-height:1.35; border-radius:7px; box-shadow:0 4px 14px rgba(0,0,0,.22); transform:translate(-50%,7px); }
+  .st.focus .lbl small { display:block; font-weight:400; color:var(--muted); margin-top:3px; font-size:12.5px; }
+  .st.focus .lbl small em { display:block; font-style:normal; color:var(--accent); margin-top:4px; font-weight:600; }
+
+  /* Detail panel (bottom sheet on phones) */
+  #panel { position:absolute; top:0; right:0; bottom:0; width:var(--panel); max-width:100%; background:var(--bg); box-shadow:-2px 0 16px rgba(0,0,0,.15);
+    overflow-y:auto; overscroll-behavior:contain; transform:translateX(105%); transition:transform .28s ease; z-index:30; }
+  #panel.open { transform:none; }
+  #panel .inner { padding:16px 22px 32px; }
+  .ptop { position:sticky; top:0; z-index:2; display:flex; justify-content:flex-end; gap:6px; padding:10px 12px 0; margin-bottom:-44px; pointer-events:none; }
+  .ptop button { pointer-events:auto; border:0; background:rgba(243,244,246,.95); height:34px; min-width:34px; padding:0 10px; border-radius:999px; font-size:14px; box-shadow:0 1px 3px rgba(0,0,0,.12); }
+  .ptop .x { font-size:20px; line-height:1; padding:0; }
+  .handle { display:none; }
+  .cat { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  .cat i { width:10px; height:10px; border-radius:50%; }
+  #panel h1 { font-size:25px; line-height:1.2; margin:6px 0 14px; padding-right:90px; }
+  .desc { margin-top:16px; }
+  .desc p:first-child { font-size:16.5px; }
+  .hero { margin:0 0 6px; position:relative; }
+  .hero img { width:100%; max-height:320px; object-fit:contain; background:var(--chip); border-radius:10px; display:block; cursor:zoom-in; }
+  .hero .zoom { position:absolute; right:8px; top:8px; border:0; background:rgba(29,34,40,.7); color:#fff; border-radius:6px; font-size:12px; padding:3px 8px; }
+  .hero figcaption { font-size:12.5px; color:var(--muted); margin-top:5px; }
+  .thumbs { display:flex; gap:6px; margin:8px 0 4px; }
+  .thumbs button { border:2px solid transparent; padding:0; border-radius:6px; overflow:hidden; background:none; }
+  .thumbs button.on { border-color:var(--fg); }
+  .thumbs img { width:60px; height:42px; object-fit:cover; display:block; }
+  .truescale { border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin:12px 0 4px; font-size:14px; }
+  .switch { display:flex; align-items:center; gap:10px; font-weight:600; cursor:pointer; }
+  .switch input { appearance:none; width:38px; height:22px; border-radius:999px; background:#cfd4da; position:relative; margin:0; cursor:pointer; transition:background .15s; flex:none; }
+  .switch input::after { content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 2px rgba(0,0,0,.25); }
+  .switch input:checked { background:var(--accent); }
+  .switch input:checked::after { left:19px; }
+  .truescale p { margin:4px 0 0 48px; color:var(--muted); font-size:13px; }
+  .truescale .op { display:none; align-items:center; gap:8px; margin:8px 0 0 48px; font-size:13px; color:var(--muted); }
+  .truescale.on .op { display:flex; }
+  .truescale .op input { flex:1; }
+  #panel h2 { font-size:12.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:20px 0 4px; }
+  #panel p { margin:0 0 8px; }
+  ul.sources { padding-left:18px; margin:4px 0; }
+  .pager { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:24px; border-top:1px solid var(--line); padding-top:14px; }
+  .pager button { border:1px solid var(--line); background:var(--bg); border-radius:10px; padding:8px 10px; text-align:left; font-size:14px; min-width:0; }
+  .pager button:hover { background:var(--chip); }
+  .pager small { display:block; color:var(--muted); font-size:12px; }
+  .pager span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
+  .pager .next { text-align:right; grid-column:2; }
+
+  /* Welcome */
+  #intro { position:absolute; left:12px; bottom:28px; width:340px; background:var(--bg); border-radius:14px; box-shadow:var(--shadow-lg); padding:16px 18px; z-index:25; display:none; }
+  #intro.open { display:block; }
+  #intro h2 { margin:0 0 6px; font-size:19px; }
+  #intro p { margin:0 0 10px; color:var(--muted); font-size:14px; }
+  #intro ul { margin:0 0 14px; padding:0; list-style:none; font-size:14px; }
+  #intro li { display:flex; gap:10px; margin:6px 0; }
+  #intro li b { flex:none; width:22px; height:22px; border-radius:50%; background:var(--chip); display:grid; place-items:center; font-size:12px; }
+  #intro .go { border:0; background:var(--fg); color:#fff; border-radius:8px; padding:8px 14px; font-weight:600; }
+
+  /* Small notices */
+  #toast { position:absolute; left:50%; bottom:32px; transform:translateX(-50%); background:var(--fg); color:#fff; padding:8px 8px 8px 16px; border-radius:999px; font-size:14px;
+    display:none; align-items:center; gap:10px; z-index:26; box-shadow:var(--shadow-lg); white-space:nowrap; }
+  #toast.open { display:flex; }
+  #toast button { border:0; background:#fff; color:var(--fg); border-radius:999px; padding:4px 12px; font-weight:600; font-size:13px; }
+  #toast button:empty { display:none; }
+  #loading { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:var(--bg); padding:8px 16px; border-radius:999px; box-shadow:var(--shadow); color:var(--muted); font-size:14px; z-index:4; }
+
+  /* List view */
+  #list { position:absolute; inset:0; background:var(--bg); overflow-y:auto; z-index:15; display:none; padding:76px 16px 40px; }
+  #list.open { display:block; }
+  #list section { max-width:1100px; margin:0 auto 28px; }
+  #list h2 { display:flex; align-items:center; gap:8px; font-size:16px; margin:0 0 10px; }
+  #list h2 i { width:12px; height:12px; border-radius:50%; }
+  #list h2 small { color:var(--muted); font-weight:400; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
+  .card { border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--bg); text-align:left; padding:0; transition:box-shadow .15s, transform .15s; }
+  .card:hover { box-shadow:var(--shadow-lg); transform:translateY(-2px); }
+  .card img { width:100%; height:150px; object-fit:cover; display:block; border-bottom:4px solid var(--c); }
+  .card div { padding:10px 14px 14px; }
+  .card h3 { margin:0 0 4px; font-size:16.5px; }
+  .card p { color:var(--muted); font-size:14px; margin:0; }
+  .empty { text-align:center; color:var(--muted); padding:40px; }
+
+  /* Full image viewer */
+  #lightbox { position:fixed; inset:0; background:rgba(15,18,22,.94); z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:20px; cursor:zoom-out; }
+  #lightbox.open { display:flex; }
+  #lightbox img { max-width:100%; max-height:calc(100% - 40px); object-fit:contain; }
+  #lightbox p { color:#dfe3e8; font-size:13px; margin:0; text-align:center; }
+
+  .maplibregl-ctrl-bottom-left { z-index:3; }
+  .home-btn { font-size:16px !important; }
+
+  @media (max-width:640px) {
+    body.panel-open .maplibregl-ctrl-bottom-right { right:0; bottom:calc((100% - 56px) * .58); }
+    body.panel-open #bar { right:10px; }
+    #bar { top:max(10px, env(safe-area-inset-top)); left:10px; right:10px; gap:6px; }
+    .searchbox { flex:1; min-width:0; }
+    #search { width:100%; }
+    #results { width:calc(100vw - 20px); }
+    .brand { padding:7px 10px; }
+    #chips { order:9; width:calc(100% + 20px); margin:0 -10px; padding:2px 10px 8px; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; }
+    .right { margin-left:0; }
+    #panel { top:auto; width:100%; height:calc(100% - 56px); border-radius:18px 18px 0 0; transform:translateY(105%); box-shadow:0 -2px 16px rgba(0,0,0,.2); }
+    /* Half open at first; scrolling or tapping the handle opens it fully */
+    #panel.open { transform:translateY(42%); }
+    #panel.open.full { transform:none; }
+    .handle { display:block; position:sticky; top:0; z-index:3; width:100%; height:22px; border:0; background:linear-gradient(var(--bg) 70%, transparent); padding:0; }
+    .handle::after { content:""; display:block; width:40px; height:5px; border-radius:3px; background:#c9ced4; margin:8px auto 0; }
+    .ptop { padding-top:0; top:22px; }
+    #panel .inner { padding:4px 18px calc(30px + env(safe-area-inset-bottom)); }
+    #panel h1 { font-size:22px; }
+    #intro { left:10px; right:10px; bottom:max(16px, env(safe-area-inset-bottom)); width:auto; }
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="layer"><svg id="ties"></svg></div>
+<div id="loading">Loading ideas…</div>
+
+<div id="bar">
+  <button class="brand" id="aboutBtn" title="About this map">Atlas Tāmaki</button>
+  <div class="searchbox">
+    <input id="search" type="search" placeholder="Search ideas or places" aria-label="Search ideas" autocomplete="off" role="combobox" aria-controls="results" aria-expanded="false">
+    <div id="results" role="listbox"></div>
+  </div>
+  <div class="right"><button id="listBtn" class="chip">☰ List</button></div>
+  <div id="chips" role="group" aria-label="Show categories"></div>
+</div>
+
+<div id="intro" role="dialog" aria-labelledby="introTitle">
+  <h2 id="introTitle">Atlas Tāmaki</h2>
+  <ul>
+    <li><b>1</b><span><span class="hover-word">Hover over</span> a picture to take a closer look.</span></li>
+    <li><b>2</b><span>Click it to read what the idea is, why it matters and where it came from.</span></li>
+    <li><b>3</b><span>Use the coloured buttons to show one kind of idea, or browse them all as a list.</span></li>
+  </ul>
+  <button class="go" id="introGo">Start exploring</button>
+</div>
+<div id="toast" role="status"><span></span><button></button></div>
+
+<div id="list"></div>
+<aside id="panel" aria-live="polite"><button class="handle" aria-label="Expand"></button><div id="panelInner"></div></aside>
+<div id="lightbox"><img alt=""><p></p></div>
+
+<script>
+const { categories: CATS, ideas: IDEAS } = window.ATLAS;
+const $ = id => document.getElementById(id);
+const narrow = () => innerWidth <= 640;
+const touchFirst = matchMedia("(hover: none)").matches;
+const store = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
+
+// ---------- state ----------
+const state = { cats: new Set(Object.keys(CATS)), q: "", open: null, imgIdx: 0, trueScale: null };
+const STICKERS = [];   // one per image: { idea, img, el, p, v, sc, rot, ... }
+const bySlug = Object.fromEntries(IDEAS.map(i => [i.slug, i]));
+let hovered = null, unfocusTimer = null;
+const allCats = () => state.cats.size === Object.keys(CATS).length;
+
+// ---------- filters ----------
+const textOf = idea => [idea.title, descriptionOf(idea), CATS[idea.category].label, ...idea.images.map(i => i.caption)].join(" ").toLowerCase();
+const matchesQuery = (idea, q = state.q) => !q || q.split(/\s+/).every(w => textOf(idea).includes(w));
+const visible = idea => state.cats.has(idea.category) && matchesQuery(idea);
+function renderChips() {
+  const count = k => IDEAS.filter(i => i.category === k && matchesQuery(i)).length;
+  $("chips").innerHTML = Object.entries(CATS).map(([k, c]) =>
+    `<button class="chip${state.cats.has(k) ? "" : " off"}" data-cat="${k}" aria-pressed="${state.cats.has(k)}"
+      title="${esc(c.about ? c.about + " " : "")}(${allCats() ? "Click to show only these" : state.cats.has(k) ? "Click to hide these" : "Click to also show these"})">
+      <i style="background:${c.color}"></i>${esc(c.label)} <span class="n">${count(k)}</span></button>`).join("")
+    + (allCats() ? "" : `<button class="chip reset" data-cat="*">Show all</button>`);
+}
+$("chips").onclick = e => {
+  const b = e.target.closest("[data-cat]"); if (!b) return;
+  const k = b.dataset.cat;
+  // From "everything", a click shows just that category; after that clicks add or remove.
+  if (k === "*") state.cats = new Set(Object.keys(CATS));
+  else if (allCats()) state.cats = new Set([k]);
+  else if (state.cats.has(k)) { state.cats.delete(k); if (!state.cats.size) state.cats = new Set(Object.keys(CATS)); }
+  else state.cats.add(k);
+  applyFilters();
+};
+function applyFilters() {
+  renderChips(); renderList();
+  if (map.getLayer("geo-line")) {
+    const f = ["in", ["get", "slug"], ["literal", IDEAS.filter(visible).map(i => i.slug)]];
+    ["geo-fill", "geo-line", "geo-point"].forEach(id => map.setFilter(id, ["all", baseFilter[id], f]));
+  }
+  const n = IDEAS.filter(visible).length;
+  if (!n) toast(state.q ? `No ideas match “${state.q}”` : "No ideas to show", "Show all", resetFilters);
+  else hideToast();
+  kick();
+}
+function resetFilters() { state.cats = new Set(Object.keys(CATS)); state.q = ""; $("search").value = ""; applyFilters(); }
+
+// ---------- search with a results list ----------
+let resultIdx = 0, results = [];
+function renderResults() {
+  const q = $("search").value.trim().toLowerCase();
+  results = q ? IDEAS.filter(i => matchesQuery(i, q)) : [];
+  resultIdx = clamp(resultIdx, 0, Math.max(0, results.length - 1));
+  const box = $("results");
+  box.classList.toggle("open", !!q && document.activeElement === $("search"));
+  $("search").setAttribute("aria-expanded", box.classList.contains("open"));
+  box.innerHTML = results.length ? results.map((i, n) => `
+    <button role="option" data-slug="${i.slug}" class="${n === resultIdx ? "on" : ""}" aria-selected="${n === resultIdx}">
+      <img src="${i.images[0]?.src || ""}" alt=""><b>${esc(i.title)}</b>
+      <small><span style="color:${CATS[i.category].color}">●</span> ${esc(CATS[i.category].label)} · ${esc(summaryOf(i))}</small></button>`).join("")
+    : `<div class="none">No ideas match. Try a place name or a word like “cycle”.</div>`;
+}
+$("search").oninput = e => { state.q = e.target.value.trim().toLowerCase(); resultIdx = 0; renderResults(); applyFilters(); };
+$("search").onfocus = renderResults;
+$("search").onblur = () => setTimeout(() => { $("results").classList.remove("open"); $("search").setAttribute("aria-expanded", "false"); }, 150);
+$("search").onkeydown = e => {
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); resultIdx += e.key === "ArrowDown" ? 1 : -1; renderResults(); }
+  else if (e.key === "Enter" && results[resultIdx]) { go(results[resultIdx].slug); $("search").blur(); }
+  else if (e.key === "Escape") { if ($("search").value) { $("search").value = ""; $("search").oninput({ target: $("search") }); } else $("search").blur(); }
+};
+$("results").onmousedown = e => e.preventDefault();   // keep focus in the box until the click lands
+$("results").onclick = e => { const b = e.target.closest("[data-slug]"); if (b) { go(b.dataset.slug); $("search").blur(); } };
+
+// ---------- list view ----------
+function renderList() {
+  const groups = Object.entries(CATS).map(([k, c]) => [k, c, IDEAS.filter(i => i.category === k && visible(i))]).filter(g => g[2].length);
+  $("list").innerHTML = groups.length ? groups.map(([k, c, ideas]) => `
+    <section><h2><i style="background:${c.color}"></i>${esc(c.label)} <small>${ideas.length}</small></h2>
+    <div class="cards">${ideas.map(i => `
+      <button class="card" data-slug="${i.slug}" style="--c:${c.color}">
+        <img src="${i.images[0]?.src || ""}" alt="" loading="lazy">
+        <div><h3>${esc(i.title)}</h3><p>${esc(summaryOf(i))}</p></div>
+      </button>`).join("")}</div></section>`).join("")
+    : `<div class="empty">No ideas match. <button class="chip" style="display:inline-flex" data-reset>Show all</button></div>`;
+}
+$("list").onclick = e => {
+  if (e.target.closest("[data-reset]")) return resetFilters();
+  const c = e.target.closest("[data-slug]"); if (c) { toggleList(false); go(c.dataset.slug); }
+};
+function toggleList(on) { $("list").classList.toggle("open", on); $("listBtn").textContent = on ? "🗺 Map" : "☰ List"; if (on) hideIntro(); }
+$("listBtn").onclick = () => toggleList(!$("list").classList.contains("open"));
+
+// ---------- welcome card and notices ----------
+if (touchFirst) document.querySelectorAll(".hover-word").forEach(s => s.textContent = "Tap");
+function showIntro() { $("intro").classList.add("open"); }
+function hideIntro() { $("intro").classList.remove("open"); store.set("atlas-intro-seen", "1"); }
+$("introGo").onclick = hideIntro;
+$("aboutBtn").onclick = () => $("intro").classList.contains("open") ? hideIntro() : showIntro();
+let toastTimer;
+function toast(msg, action, fn, ms) {
+  clearTimeout(toastTimer);
+  $("toast").querySelector("span").textContent = msg;
+  const b = $("toast").querySelector("button"); b.textContent = action || ""; b.onclick = () => { hideToast(); fn?.(); };
+  $("toast").classList.add("open");
+  if (ms) toastTimer = setTimeout(hideToast, ms);
+}
+const hideToast = () => $("toast").classList.remove("open");
+
+// ---------- map ----------
+const map = new maplibregl.Map({ container: "map", style: STYLE, center: [174.80, -36.89], zoom: narrow() ? 10.8 : 11.6, attributionControl: { compact: true } });
+map.dragRotate.disable(); map.touchZoomRotate.disableRotation();
+// Keep image gestures inside MapLibre's interaction surface, so its native
+// drag, wheel and touch handlers work even when a gesture starts on a picture.
+map.getCanvasContainer().appendChild($("layer"));
+map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-left");
+addBasemapControl(map);
+addTransportControl(map);
+// A button that brings every visible idea back into view.
+map.addControl({
+  onAdd() {
+    const d = document.createElement("div"); d.className = "maplibregl-ctrl maplibregl-ctrl-group";
+    d.innerHTML = `<button class="home-btn" title="Show all ideas" aria-label="Show all ideas">⌂</button>`;
+    d.onclick = showAll; return d;
+  }, onRemove() {}
+}, "bottom-left");
+const kick = () => map.triggerRepaint();
+const baseFilter = {
+  "geo-fill": ["==", ["geometry-type"], "Polygon"],
+  "geo-line": ["any", ["==", ["geometry-type"], "LineString"], ["==", ["geometry-type"], "Polygon"]],
+  "geo-point": ["==", ["geometry-type"], "Point"]
+};
+function showAll() {
+  const ideas = IDEAS.filter(visible);
+  const pts = ideas.flatMap(i => [...i.images.map(m => m.center), ...geoPoints(i.geometry)]);
+  if (pts.length) map.fitBounds(boundsOf(pts), { padding: panelPadding(80), maxZoom: 14, duration: 450 });
+}
+
+function addGeometry() {
+  const features = IDEAS.filter(i => i.geometry).map(i => ({ type: "Feature", geometry: i.geometry, properties: { slug: i.slug, color: CATS[i.category].color } }));
+  map.addSource("geo", { type: "geojson", data: { type: "FeatureCollection", features } });
+  map.addLayer({ id: "geo-fill", type: "fill", source: "geo", filter: baseFilter["geo-fill"], paint: { "fill-color": ["get", "color"], "fill-opacity": .15 } });
+  // A wide invisible line makes routes easy to hover and tap.
+  map.addLayer({ id: "geo-hit", type: "line", source: "geo", filter: baseFilter["geo-line"], paint: { "line-color": "#000", "line-opacity": 0, "line-width": 16 } });
+  map.addLayer({ id: "geo-line", type: "line", source: "geo", filter: baseFilter["geo-line"], layout: { "line-cap": "round", "line-join": "round" },
+    paint: { "line-color": ["get", "color"], "line-width": 4, "line-opacity": .55 } });
+  map.addLayer({ id: "geo-point", type: "circle", source: "geo", filter: baseFilter["geo-point"], paint: { "circle-color": ["get", "color"], "circle-radius": 6, "circle-stroke-color": "#fff", "circle-stroke-width": 2 } });
+  for (const id of ["geo-hit", "geo-fill", "geo-point"]) {
+    // Hovering a route lifts its pictures, as hovering a picture highlights its route.
+    map.on("mousemove", id, e => {
+      map.getCanvas().style.cursor = "pointer";
+      const idea = bySlug[e.features[0].properties.slug];
+      if (!visible(idea)) return;
+      const s = STICKERS.find(s => s.idea === idea && s.p);
+      if (s && hovered !== s) { clearTimeout(unfocusTimer); hovered = s; kick(); }
+    });
+    map.on("mouseleave", id, () => { map.getCanvas().style.cursor = ""; unfocusSoon(); });
+    map.on("click", id, e => { e.originalEvent.handled = true; go(e.features[0].properties.slug); });
+  }
+}
+// Highlight the open or hovered idea's line; dim the rest when one is open.
+let lastHl = null;
+function highlightLines() {
+  const slug = hovered?.idea.slug || state.open?.slug || "";
+  if (slug === lastHl || !map.getLayer("geo-line")) return;
+  lastHl = slug;
+  const is = ["==", ["get", "slug"], slug];
+  map.setPaintProperty("geo-line", "line-width", ["case", is, 7, 4]);
+  map.setPaintProperty("geo-line", "line-opacity", ["case", is, .95, slug ? .3 : .55]);
+}
+// A click on empty map unfocuses a picture first, then closes the open idea.
+map.on("click", e => {
+  if (e.originalEvent.handled) return;
+  if (hovered) { hovered = null; kick(); }
+  else if (state.open) closeIdea();
+});
+map.on("movestart", e => { if (e.originalEvent) hideIntro(); });
+
+// ---------- stickers ----------
+const baseSize = () => narrow() ? 62 : 84;
+function unfocusSoon() { clearTimeout(unfocusTimer); unfocusTimer = setTimeout(() => { hovered = null; kick(); }, 140); }
+function buildStickers() {
+  for (const idea of IDEAS) idea.images.forEach((img, i) => {
+    const s = makeSticker(idea, img, i, CATS[idea.category].color);
+    const title = idea.images.length > 1 && img.caption ? img.caption.replace(/\s*\(stand-in\)/, "") : idea.title;
+    s.el.setAttribute("role", "button"); s.el.tabIndex = 0;
+    s.el.setAttribute("aria-label", `${idea.title}: ${summaryOf(idea)}`);
+    s.el.innerHTML = `<img src="${img.src}" alt="" draggable="false"><span class="lbl">${esc(title)}<small>${esc(summaryOf(idea))}<em>${touchFirst ? "Tap again" : "Click"} to read more</em></small></span>`;
+    s.el.onpointerdown = e => {
+      if (!e.isPrimary || e.button !== 0) return;
+      s.pointerDragged = false;
+      const gesture = new AbortController(), x = e.clientX, y = e.clientY;
+      let lastX = x, lastY = y;
+      // Mouse presses on focusable overlays can be consumed before MapLibre
+      // receives them. Capture this pointer and pan through the public API.
+      // Touch stays with MapLibre so two-finger zoom remains available.
+      const pan = e.pointerType === "mouse" && map.dragPan.isEnabled();
+      if (pan) {
+        e.preventDefault();
+        map.stop();
+        s.el.setPointerCapture(e.pointerId);
+      }
+      const track = ev => {
+        if (ev.pointerId !== e.pointerId) return;
+        if (Math.hypot(ev.clientX - x, ev.clientY - y) > 4) s.pointerDragged = true;
+        if (pan && s.pointerDragged) {
+          map.panBy([lastX - ev.clientX, lastY - ev.clientY], { duration: 0 }, { originalEvent: ev });
+          lastX = ev.clientX; lastY = ev.clientY;
+        }
+      };
+      const finish = ev => {
+        if (ev.pointerId !== e.pointerId) return;
+        if (ev.type === "pointerup") track(ev);
+        gesture.abort();
+        if (s.el.hasPointerCapture(e.pointerId)) s.el.releasePointerCapture(e.pointerId);
+      };
+      window.addEventListener("pointermove", track, { signal: gesture.signal });
+      window.addEventListener("pointerup", finish, { signal: gesture.signal });
+      window.addEventListener("pointercancel", finish, { signal: gesture.signal });
+    };
+    // Mouse: entering focuses straight away; leaving waits a moment so sliding between neighbours doesn't flicker.
+    s.el.onpointerenter = e => { if (e.pointerType !== "mouse") return; hovered = s; clearTimeout(unfocusTimer); kick(); };
+    s.el.onpointerleave = e => { if (e.pointerType === "mouse") unfocusSoon(); };
+    s.el.onfocus = () => { hovered = s; clearTimeout(unfocusTimer); kick(); };
+    s.el.onblur = () => unfocusSoon();
+    // Touch: first tap focuses, second tap opens.
+    s.el.onpointerup = e => { s.lastPointer = e.pointerType; };
+    s.el.onclick = e => {
+      e.stopPropagation();
+      if (s.pointerDragged && e.detail !== 0) return;
+      hideIntro();
+      if (s.lastPointer && s.lastPointer !== "mouse" && hovered !== s) { hovered = s; kick(); return; }
+      go(idea.slug, i);
+    };
+    s.el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(idea.slug, i); } };
+    $("layer").appendChild(s.el);
+    STICKERS.push(s);
+  });
+}
+function frame() {
+  highlightLines();
+  const busy = jostle(map, STICKERS, {
+    base: baseSize(), hovered, ties: $("ties"),
+    show: s => visible(s.idea) && state.trueScale !== s,
+    style: (s) => {
+      const sel = state.open === s.idea;
+      if (sel && s !== hovered) s.el.style.zIndex = 50;
+      s.el.classList.toggle("sel", sel);
+      s.el.classList.toggle("focus", s === hovered && focusedEnough(s));
+    }
+  });
+  if (busy) kick();
+}
+
+// ---------- detail panel ----------
+function go(slug, imgIdx = 0) { location.hash = "idea/" + slug + (imgIdx ? "/" + imgIdx : ""); }
+function route() {
+  const m = location.hash.match(/^#idea\/([\w-]+)(?:\/(\d+))?/);
+  const idea = m && bySlug[m[1]];
+  if (idea) openIdea(idea, +(m[2] || 0)); else closeIdea(false);
+}
+window.addEventListener("hashchange", route);
+
+function panelPadding(base = 40) {
+  if (narrow()) return { top: 110, bottom: state.open ? innerHeight * .5 : base, left: 30, right: 30 };
+  return { top: 80, bottom: base, left: base, right: state.open ? $("panel").offsetWidth + base : base };
+}
+function openIdea(idea, imgIdx) {
+  const changed = state.open !== idea;
+  state.open = idea; state.imgIdx = clamp(imgIdx, 0, idea.images.length - 1);
+  if (state.trueScale && state.trueScale.idea !== idea) setTrueScale(null);
+  hovered = null;
+  hideIntro(); toggleList(false);
+  document.title = idea.title + " · Atlas Tāmaki";
+  renderPanel();
+  if (changed) { $("panel").classList.remove("full"); $("panel").scrollTop = 0; }
+  $("panel").classList.add("open"); document.body.classList.add("panel-open");
+  if (changed) {
+    // Frame the idea: its line or area if it has one, otherwise its images' spots. If it's already
+    // in view the map stays put, and it never zooms in more than one step, so opening an idea is calm.
+    const pts = [...idea.images.map(i => i.center), ...geoPoints(idea.geometry)];
+    if (!inView(pts)) map.fitBounds(boundsOf(pts), { padding: panelPadding(), maxZoom: Math.min(15, map.getZoom() + 1), duration: 450 });
+  }
+  kick();
+}
+function inView(pts) {
+  const pad = panelPadding(), w = map.getContainer().clientWidth, h = map.getContainer().clientHeight;
+  return pts.every(p => { const q = map.project(p); return q.x > pad.left && q.x < w - pad.right && q.y > pad.top && q.y < h - pad.bottom; });
+}
+function closeIdea(updateHash = true) {
+  if (!state.open) return;
+  setTrueScale(null);
+  state.open = null;
+  document.title = "Atlas Tāmaki";
+  $("panel").classList.remove("open", "full"); document.body.classList.remove("panel-open");
+  if (updateHash) history.pushState(null, "", location.pathname + location.search);
+  kick();
+}
+
+function renderPanel() {
+  const idea = state.open, cat = CATS[idea.category], img = idea.images[state.imgIdx];
+  const on = state.trueScale?.img === img;
+  // Previous and next follow the order of the list view, within the current filters.
+  const order = Object.keys(CATS).flatMap(k => IDEAS.filter(i => i.category === k && visible(i)));
+  const at = order.indexOf(idea), prev = at > 0 ? order[at - 1] : null, next = at >= 0 && at < order.length - 1 ? order[at + 1] : null;
+  $("panelInner").innerHTML = `
+    <div class="ptop"><button id="shareBtn" title="Share this idea">Share</button><button class="x" aria-label="Close" title="Close (Esc)">×</button></div>
+    <div class="inner">
+    <span class="cat"><i style="background:${cat.color}"></i>${esc(cat.label)}</span>
+    <h1>${esc(idea.title)}</h1>
+    ${img ? `<figure class="hero"><img src="${img.src}" alt="${esc(img.caption)}"><button class="zoom" aria-label="View full size">⤢ Full size</button>
+      <figcaption>${esc(img.caption)}${img.credit ? ` · Credit: ${esc(img.credit)}` : ""}</figcaption></figure>` : ""}
+    ${idea.images.length > 1 ? `<div class="thumbs">${idea.images.map((im, i) =>
+      `<button class="${i === state.imgIdx ? "on" : ""}" data-img="${i}" aria-label="${esc(im.caption)}"><img src="${im.src}" alt=""></button>`).join("")}</div>` : ""}
+    ${img ? `<div class="truescale${on ? " on" : ""}">
+      <label class="switch"><input type="checkbox" id="tsToggle"${on ? " checked" : ""}> Line it up with the streets</label>
+      <p>Lays this picture on the map at its real size and angle.</p>
+      <label class="op">See-through <input id="tsOpacity" type="range" min="0.1" max="1" step="0.05" value="${state.trueScale?.opacity ?? .85}"></label>
+    </div>` : ""}
+    <div class="desc">${descriptionOf(idea).split(/\n\s*\n/).filter(t => t.trim()).map(t => `<p>${esc(t.trim())}</p>`).join("")}</div>
+    ${idea.sources?.length ? `<h2>Sources</h2><ul class="sources">${idea.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join("")}</ul>` : ""}
+    <nav class="pager">
+      ${prev ? `<button data-go="${prev.slug}"><small>← Previous</small><span>${esc(prev.title)}</span></button>` : ""}
+      ${next ? `<button class="next" data-go="${next.slug}"><small>Next →</small><span>${esc(next.title)}</span></button>` : ""}
+    </nav>
+    </div>`;
+}
+$("panelInner").onclick = e => {
+  if (e.target.closest(".x")) return closeIdea();
+  if (e.target.closest("#shareBtn")) return share();
+  const t = e.target.closest("[data-img]");
+  if (t) { go(state.open.slug, +t.dataset.img); return; }
+  const g = e.target.closest("[data-go]");
+  if (g) { go(g.dataset.go); return; }
+  if (e.target.matches(".hero img, .hero .zoom")) {
+    const img = state.open.images[state.imgIdx];
+    $("lightbox").querySelector("img").src = img.src;
+    $("lightbox").querySelector("p").textContent = [img.caption, img.credit && "Credit: " + img.credit].filter(Boolean).join(" · ");
+    $("lightbox").classList.add("open");
+  }
+};
+$("panelInner").onchange = e => {
+  if (e.target.id === "tsToggle") { const img = state.open.images[state.imgIdx]; setTrueScale(e.target.checked ? img : null); renderPanel(); }
+};
+$("panelInner").oninput = e => {
+  if (e.target.id === "tsOpacity" && state.trueScale) { state.trueScale.opacity = +e.target.value; map.setPaintProperty("truescale", "raster-opacity", +e.target.value); }
+};
+// Phone sheet: tapping the handle, or scrolling the text, opens it fully.
+document.querySelector(".handle").onclick = () => $("panel").classList.toggle("full");
+$("panel").addEventListener("scroll", () => { if (narrow() && $("panel").scrollTop > 10) $("panel").classList.add("full"); }, { passive: true });
+
+async function share() {
+  const idea = state.open, url = location.href;
+  if (navigator.share && touchFirst) { try { await navigator.share({ title: idea.title, text: summaryOf(idea), url }); } catch {} return; }
+  try { await navigator.clipboard.writeText(url); toast("Link copied", null, null, 2000); }
+  catch { toast(url, null, null, 5000); }
+}
+$("lightbox").onclick = () => $("lightbox").classList.remove("open");
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape" || e.target === $("search")) return;
+  if ($("lightbox").classList.contains("open")) $("lightbox").classList.remove("open");
+  else if ($("intro").classList.contains("open")) hideIntro();
+  else if (state.open) closeIdea();
+  else if ($("list").classList.contains("open")) toggleList(false);
+});
+
+// True scale: the drawing lined up with the ground, replacing its sticker until switched back.
+function setTrueScale(img) {
+  if (map.getLayer("truescale")) map.removeLayer("truescale");
+  if (map.getSource("truescale")) map.removeSource("truescale");
+  if (!img) { state.trueScale = null; kick(); return; }
+  const c = corners(img), opacity = state.trueScale?.opacity ?? .85;
+  map.addSource("truescale", { type: "image", url: img.src, coordinates: c });
+  map.addLayer({ id: "truescale", type: "raster", source: "truescale", paint: { "raster-opacity": opacity, "raster-fade-duration": 0 } }, "geo-fill");
+  state.trueScale = STICKERS.find(s => s.img === img);
+  state.trueScale.opacity = opacity;
+  map.fitBounds(boundsOf(c), { padding: panelPadding(), duration: 450 });
+  kick();
+}
+
+// ---------- start ----------
+renderChips();
+loadImages(IDEAS, CATS).then(() => {
+  buildStickers();
+  renderList();
+  whenStyleReady(map, () => {
+    addGeometry(); map.on("render", frame); applyFilters(); route();
+    $("loading").remove();
+    if (!store.get("atlas-intro-seen") && !state.open) showIntro();
+  });
+});
+addEventListener("resize", kick);
+</script>
+</body>
+</html>

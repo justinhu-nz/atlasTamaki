@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype: Side by side</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="proto.js"></script>
+<link rel="stylesheet" href="proto.css">
+<style>
+  #map { right:420px; }
+  #fig { position:absolute; top:0; right:0; bottom:0; width:420px; background:#f6f7f9; border-left:1px solid #e3e6ea; overflow:auto; padding:16px; box-sizing:border-box; }
+  #fig h1 { font-size:18px; margin:0 0 4px; }
+  #fig p { color:#5f6b76; margin:0 0 12px; font-size:13px; }
+  #wrap { position:relative; cursor:crosshair; }
+  #wrap img { width:100%; display:block; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,.15); }
+  .x { position:absolute; width:22px; height:22px; margin:-11px 0 0 -11px; pointer-events:none; display:none; }
+  .x::before, .x::after { content:""; position:absolute; background:#d6336c; }
+  .x::before { left:10px; top:0; width:2px; height:22px; }
+  .x::after { top:10px; left:0; height:2px; width:22px; }
+  .mapx { width:22px; height:22px; position:relative; pointer-events:none; }
+  .mapx::before, .mapx::after { content:""; position:absolute; background:#d6336c; box-shadow:0 0 0 1px #fff; }
+  .mapx::before { left:10px; top:0; width:2px; height:22px; }
+  .mapx::after { top:10px; left:0; height:2px; width:22px; }
+  @media (max-width:760px) {
+    #map { right:0; bottom:50%; }
+    #fig { top:50%; width:100%; border-left:0; border-top:1px solid #e3e6ea; }
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<aside id="fig">
+  <h1>Light rail to the airport</h1>
+  <p>Point at the figure to find that spot on the map, or point at the map to find it on the figure. Click the figure to fly there.</p>
+  <div id="wrap"><img id="img" alt="Long list light rail alignment options"><div class="x" id="figX"></div></div>
+  <p style="margin-top:8px">Fig 6.3: long list light rail alignment options. Source: light rail business case.</p>
+</aside>
+<div class="note">
+  <b>Side by side</b>: the figure stays crisp in the panel; the map stays clean.
+  <nav><a href="lens.html">Lens</a> · <a href="side.html">Side by side</a> · <a href="fade.html">Faded until hovered</a></nav>
+</div>
+<script>
+const map = new maplibregl.Map({ container: "map", style: STYLE, ...VIEW });
+const img = document.getElementById("img"), figX = document.getElementById("figX");
+img.src = OVERLAY.url;
+const mx = document.createElement("div"); mx.className = "mapx";
+const mapMarker = new maplibregl.Marker({ element: mx });
+map.on("load", () => addOutline(map));
+
+const frac = e => { const r = img.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
+img.addEventListener("mousemove", e => mapMarker.setLngLat(toLngLat(...frac(e))).addTo(map));
+img.addEventListener("mouseleave", () => mapMarker.remove());
+img.addEventListener("click", e => map.flyTo({ center: toLngLat(...frac(e)), zoom: 15 }));
+
+map.on("mousemove", e => {
+  const f = toFrac([e.lngLat.lng, e.lngLat.lat]);
+  if (!inside(f)) { figX.style.display = "none"; return; }
+  Object.assign(figX.style, { display: "block", left: f[0] * 100 + "%", top: f[1] * 100 + "%" });
+});
+map.getCanvas().addEventListener("mouseleave", () => figX.style.display = "none");
+</script>
+</body>
+</html>

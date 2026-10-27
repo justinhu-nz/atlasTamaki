@@ -1,0 +1,310 @@
+[
+  {
+    "n": 1,
+    "id": "542a4493-b6f1-4795-bf9f-2ef925234126",
+    "url": "https://felt-user-content.imgix.net/map_images/542a4493-b6f1-4795-bf9f-2ef925234126.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=e5a0d84c7352883aff46d9ab8e276199",
+    "center": [
+      174.85482795000001,
+      -36.8794976
+    ],
+    "wm": 1567,
+    "rot": -0.0
+  },
+  {
+    "n": 2,
+    "id": "2c522733-c719-4908-9b52-97bd10f355e1",
+    "url": "https://felt-user-content.imgix.net/map_images/2c522733-c719-4908-9b52-97bd10f355e1.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=9b45126997fcbf638ec0125264e10929",
+    "center": [
+      174.904848875,
+      -36.91581205
+    ],
+    "wm": 2668,
+    "rot": -7.0
+  },
+  {
+    "n": 3,
+    "id": "ccb46413-dd99-45bb-8b3f-69de0f68de44",
+    "url": "https://felt-user-content.imgix.net/map_images/ccb46413-dd99-45bb-8b3f-69de0f68de44.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=2bc71ae54ddc6f72c7ebaf1a51f3644e",
+    "center": [
+      174.74689065,
+      -36.89580745
+    ],
+    "wm": 1735,
+    "rot": -0.0
+  },
+  {
+    "n": 4,
+    "id": "d4cb9028-059c-4f84-b977-efcaa6484879",
+    "url": "https://felt-user-content.imgix.net/map_images/d4cb9028-059c-4f84-b977-efcaa6484879.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=7ddae706c189205a26eb08649b90dc25",
+    "center": [
+      174.8444678,
+      -36.91762885
+    ],
+    "wm": 1171,
+    "rot": 79.5
+  },
+  {
+    "n": 5,
+    "id": "cd2b1115-f559-44fe-bf26-6f946733d73a",
+    "url": "https://felt-user-content.imgix.net/map_images/cd2b1115-f559-44fe-bf26-6f946733d73a.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=2115e6cf682bdb7438d90ba674465ca1",
+    "center": [
+      174.81097945,
+      -36.8640302
+    ],
+    "wm": 1426,
+    "rot": -0.0
+  },
+  {
+    "n": 6,
+    "id": "7dcfd5c8-1959-4a8f-82bb-09c9b797ed87",
+    "url": "https://felt-user-content.imgix.net/map_images/7dcfd5c8-1959-4a8f-82bb-09c9b797ed87.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=3767eda4cca6800b344c705bf495f708",
+    "center": [
+      174.85093225,
+      -36.8998336
+    ],
+    "wm": 1766,
+    "rot": -0.0
+  },
+  {
+    "n": 7,
+    "id": "389657a7-1701-4117-aab3-dd4ed7ba0d7b",
+    "url": "https://felt-user-content.imgix.net/map_images/389657a7-1701-4117-aab3-dd4ed7ba0d7b.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=274a6c2f2e15db29378ebe2137fac0cd",
+    "center": [
+      174.79445085,
+      -36.88949345
+    ],
+    "wm": 402,
+    "rot": -0.0
+  },
+  {
+    "n": 8,
+    "id": "c418f851-31c8-4b6b-8ffd-873cd5b53f63",
+    "url": "https://felt-user-content.imgix.net/map_images/c418f851-31c8-4b6b-8ffd-873cd5b53f63.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=59ffe8c7e0205fa39ff31d2213779c9d",
+    "center": [
+      174.78031345,
+      -36.8539323
+    ],
+    "wm": 1513,
+    "rot": -0.0
+  },
+  {
+    "n": 9,
+    "id": "bd4e531c-44b4-4a95-ada6-43bb09fb9195",
+    "url": "https://felt-user-content.imgix.net/map_images/bd4e531c-44b4-4a95-ada6-43bb09fb9195.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=1f34246d38d2d10f889965a12a910f75",
+    "center": [
+      174.83823124999998,
+      -36.913450999999995
+    ],
+    "wm": 868,
+    "rot": -0.0
+  },
+  {
+    "n": 10,
+    "id": "9005d3e5-1792-4b8c-afc3-e94207e1fd94",
+    "url": "https://felt-user-content.imgix.net/map_images/9005d3e5-1792-4b8c-afc3-e94207e1fd94.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=5fe6472496a7059c4408ec6241dcc3d1",
+    "center": [
+      174.7197949,
+      -36.7385658
+    ],
+    "wm": 2391,
+    "rot": -0.0
+  },
+  {
+    "n": 11,
+    "id": "414049c8-201f-4193-a7e8-6f5c99571f01",
+    "url": "https://felt-user-content.imgix.net/map_images/414049c8-201f-4193-a7e8-6f5c99571f01.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=cd09e18fa19d26c2998dcdedbaf1a999",
+    "center": [
+      174.8552434,
+      -36.9884377
+    ],
+    "wm": 938,
+    "rot": -0.0
+  },
+  {
+    "n": 12,
+    "id": "3b0bb232-0cb7-4d02-95af-5129e8933bbf",
+    "url": "https://felt-user-content.imgix.net/map_images/3b0bb232-0cb7-4d02-95af-5129e8933bbf.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=cbd4493a26ce4a51fb0feb026511d5b5",
+    "center": [
+      174.75241799999998,
+      -36.875676999999996
+    ],
+    "wm": 1247,
+    "rot": -0.0
+  },
+  {
+    "n": 13,
+    "id": "8a9979c4-d4b6-4165-b0b5-fe74f95ed68e",
+    "url": "https://felt-user-content.imgix.net/map_images/8a9979c4-d4b6-4165-b0b5-fe74f95ed68e.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=dfbddbf621d2186ef3c2f2ae692ad0ba",
+    "center": [
+      174.75712755,
+      -36.88661355
+    ],
+    "wm": 1185,
+    "rot": -0.0
+  },
+  {
+    "n": 14,
+    "id": "b3cfe633-1160-4a69-b897-187fe48cfdb6",
+    "url": "https://felt-user-content.imgix.net/map_images/b3cfe633-1160-4a69-b897-187fe48cfdb6.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=973c9a37f78d2cdd2d8181fa5236b45c",
+    "center": [
+      174.87874084999999,
+      -36.993584999999996
+    ],
+    "wm": 414,
+    "rot": -0.0
+  },
+  {
+    "n": 15,
+    "id": "59f3e533-aad9-429a-8891-6e1fa9299cf2",
+    "url": "https://felt-user-content.imgix.net/map_images/59f3e533-aad9-429a-8891-6e1fa9299cf2.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=a201f6baa145c7da123f432303876b56",
+    "center": [
+      174.68093485,
+      -36.798705999999996
+    ],
+    "wm": 2594,
+    "rot": -0.0
+  },
+  {
+    "n": 16,
+    "id": "05e98e73-e130-4df8-a4f6-910c651e97d5",
+    "url": "https://felt-user-content.imgix.net/map_images/05e98e73-e130-4df8-a4f6-910c651e97d5.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=6443e6a20348cb1c97612fd66075e602",
+    "center": [
+      174.87769824999998,
+      -36.99126515
+    ],
+    "wm": 640,
+    "rot": -0.0
+  },
+  {
+    "n": 17,
+    "id": "510665d8-1c0a-4642-a3fe-ffeca20df002",
+    "url": "https://felt-user-content.imgix.net/map_images/510665d8-1c0a-4642-a3fe-ffeca20df002.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=4708af419bf539f997e7600e88002848",
+    "center": [
+      174.7469084,
+      -36.8866162
+    ],
+    "wm": 1009,
+    "rot": -0.0
+  },
+  {
+    "n": 18,
+    "id": "8dcd1fb0-8599-4841-a9a9-e6313883b7cb",
+    "url": "https://felt-user-content.imgix.net/map_images/8dcd1fb0-8599-4841-a9a9-e6313883b7cb.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=2c3a49b2e81fbb8abc5fd6c5d23bf97f",
+    "center": [
+      174.8306393,
+      -36.937310425
+    ],
+    "wm": 2334,
+    "rot": -99.6
+  },
+  {
+    "n": 19,
+    "id": "6f3f2b6c-3f14-49ed-8d0c-008279463745",
+    "url": "https://felt-user-content.imgix.net/map_images/6f3f2b6c-3f14-49ed-8d0c-008279463745.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=01b8a277f24ff8d9d38da0bd4130b46e",
+    "center": [
+      174.73664995000001,
+      -36.76113530000001
+    ],
+    "wm": 1417,
+    "rot": -0.0
+  },
+  {
+    "n": 20,
+    "id": "2926c09c-d35a-4817-bf24-b88c4c3a6ad2",
+    "url": "https://felt-user-content.imgix.net/map_images/2926c09c-d35a-4817-bf24-b88c4c3a6ad2.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=f3c38127b1626b34ff9e94aeb4eca434",
+    "center": [
+      174.70635049999999,
+      -36.8797133
+    ],
+    "wm": 1414,
+    "rot": -0.0
+  },
+  {
+    "n": 21,
+    "id": "6adb0f42-19ed-46ea-bccb-07ed4ae3911a",
+    "url": "https://felt-user-content.imgix.net/map_images/6adb0f42-19ed-46ea-bccb-07ed4ae3911a.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=2719483327aa33ebcd72da0c8b2644f6",
+    "center": [
+      174.74426465,
+      -36.7748353
+    ],
+    "wm": 2383,
+    "rot": -0.0
+  },
+  {
+    "n": 22,
+    "id": "1df980cd-8420-49ad-a349-9da2624a3adc",
+    "url": "https://felt-user-content.imgix.net/map_images/1df980cd-8420-49ad-a349-9da2624a3adc.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=c80b31c5857dcebe6c6fd9b9bc186612",
+    "center": [
+      174.73658740000002,
+      -36.87481185
+    ],
+    "wm": 905,
+    "rot": -0.0
+  },
+  {
+    "n": 23,
+    "id": "45429dac-895d-4985-b8f0-ee5a6ca2e6a7",
+    "url": "https://felt-user-content.imgix.net/map_images/45429dac-895d-4985-b8f0-ee5a6ca2e6a7.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=8e0c7c36369b3d1b9b7eff2e529c9eb1",
+    "center": [
+      174.92493805,
+      -37.04424315
+    ],
+    "wm": 9565,
+    "rot": -0.3
+  },
+  {
+    "n": 24,
+    "id": "5df7e72a-0d87-460c-8b75-6858d24f489b",
+    "url": "https://felt-user-content.imgix.net/map_images/5df7e72a-0d87-460c-8b75-6858d24f489b.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=c3413bfad003c58ff7d0a982c4f94175",
+    "center": [
+      174.75148145,
+      -36.8164484
+    ],
+    "wm": 2386,
+    "rot": -0.0
+  },
+  {
+    "n": 25,
+    "id": "ef4655dc-ce4c-4720-82b3-ead244795adb",
+    "url": "https://felt-user-content.imgix.net/map_images/ef4655dc-ce4c-4720-82b3-ead244795adb.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=8fc48cae1e45bb5cda2b3b9d32bd470d",
+    "center": [
+      174.76157665,
+      -36.8586899
+    ],
+    "wm": 1319,
+    "rot": -0.0
+  },
+  {
+    "n": 26,
+    "id": "ad92c9b2-7401-495b-a84e-7254ce26c9d5",
+    "url": "https://felt-user-content.imgix.net/map_images/ad92c9b2-7401-495b-a84e-7254ce26c9d5.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=a41230f33f7191939ccf3a4cca9ecd49",
+    "center": [
+      174.76395195,
+      -36.8472005
+    ],
+    "wm": 1494,
+    "rot": -0.0
+  },
+  {
+    "n": 27,
+    "id": "9553d24c-bf8f-4bf5-938a-b60cb5463bac",
+    "url": "https://felt-user-content.imgix.net/map_images/9553d24c-bf8f-4bf5-938a-b60cb5463bac.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=8181eed58428f420b3968fb432b32a17",
+    "center": [
+      174.777584,
+      -36.839504649999995
+    ],
+    "wm": 1531,
+    "rot": -0.0
+  },
+  {
+    "n": 28,
+    "id": "07bf964e-5f02-4347-8d56-eaebffc4dea8",
+    "url": "https://felt-user-content.imgix.net/map_images/07bf964e-5f02-4347-8d56-eaebffc4dea8.png?auto=compress%2Cformat&fit=max&fm=auto&h=2000&w=2000&s=48c80db47ec17461b600fd5f25bdaede",
+    "center": [
+      174.76083154999998,
+      -36.839352250000005
+    ],
+    "wm": 1461,
+    "rot": -0.0
+  }
+]
