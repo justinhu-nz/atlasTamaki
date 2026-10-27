@@ -30,16 +30,52 @@ function fakeSketch(img, color, title) {
 // Sets img.src (its file, or a drawn stand-in) and img.aspect for one image.
 async function loadImage(img, color, title) {
   img.src = img.file || (img.kind === "drawing" ? fakeSketch(img, color, title) : fakePhoto(img, color, title));
+  const asset = window.ATLAS_IMAGES?.[img.file];
+  if (asset) {
+    img.aspect = asset.width / asset.height;
+    return; // Dimensions are known: no request or decode of the original at startup.
+  }
   img.aspect = await readAspect(img.src);
 }
 // Width ÷ height of an image. Uses the load event rather than decode(), which can stall in a hidden tab.
 const readAspect = src => new Promise(done => {
   const el = new Image();
-  el.onload = () => done(el.naturalWidth / el.naturalHeight || 1.4);
-  el.onerror = () => done(1.4);
+  const finish = aspect => { clearTimeout(timeout); el.onload = el.onerror = null; done(aspect); };
+  const timeout = setTimeout(() => { finish(1.4); el.removeAttribute("src"); }, 10000);
+  el.onload = () => finish(el.naturalWidth / el.naturalHeight || 1.4);
+  el.onerror = () => finish(1.4);
   el.src = src;
 });
 const loadImages = (ideas, cats) => Promise.all(ideas.flatMap(idea => idea.images.map(img => loadImage(img, cats[idea.category].color, idea.title))));
+
+// Select a bounded display size; full-size viewing deliberately keeps img.src (the original).
+function imageURL(img, size = "thumb") {
+  return img && (window.ATLAS_IMAGES?.[img.file]?.[size] || img.src || img.file) || "";
+}
+function imageTag(img, size = "thumb", attrs = "") {
+  return `<img src="${esc(imageURL(img, size))}" decoding="async" ${attrs}>`;
+}
+
+// Sticker animation does not need to redraw WebGL tiles. During map movement, draw in
+// MapLibre's render event to keep overlays aligned; settle hover/collisions with DOM-only frames.
+function stickerRenderer(map, draw) {
+  let pending = 0, dirty = true;
+  const run = () => {
+    cancelAnimationFrame(pending); pending = 0;
+    if (document.hidden) return;
+    dirty = false;
+    if (draw()) schedule();
+  };
+  const schedule = () => { dirty = true; if (!pending && !document.hidden) pending = requestAnimationFrame(run); };
+  map.on("move", () => { dirty = true; });
+  map.on("resize", schedule);
+  map.on("render", () => { if (dirty && !document.hidden) run(); });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { cancelAnimationFrame(pending); pending = 0; }
+    else schedule();
+  });
+  return schedule;
+}
 
 // Height in metres at true scale: stand-ins carry their own, real images follow their aspect ratio.
 const heightM = img => img.hm && !img.file ? img.hm : img.wm / img.aspect;
@@ -93,12 +129,18 @@ function jostle(map, stickers, o) {
   const labels = zoom >= 12.7, gap = 3 + (GAP - 3) * detail;
   let easing = 0, moving = 0, fresh = false;
   const ha = hovered && map.project(hovered.img.center), live = [];
+  const container = map.getContainer(), width = container.clientWidth, height = container.clientHeight;
+  // Include a generous margin for displaced cards, labels and focus expansion at the edges.
+  const margin = Math.max(o.base * 3, 240);
   for (const s of stickers) {
-    const show = o.show(s);
-    s.el.style.display = show ? "" : "none";
-    if (!show) { s.p = null; continue; }
+    const a = o.show(s) && map.project(s.img.center);
+    const show = a && (s === hovered || (a.x >= -margin && a.x <= width + margin && a.y >= -margin && a.y <= height + margin));
+    const display = show ? "" : "none";
+    if (s.el.style.display !== display) s.el.style.display = display;
+    if (!show) { s.p = null; s.pa = null; continue; }
+    const image = s.el.firstElementChild;
+    if (image?.dataset.src) { image.src = image.dataset.src; delete image.dataset.src; }
     // Focus: hovered grows and straightens; neighbours shrink a little, more the closer they are.
-    const a = map.project(s.img.center);
     const target = !hovered ? 1 : s === hovered ? Math.max(FOCUS, o.base * 1.25 / base) : 1 - SHRINK * Math.exp(-Math.hypot(a.x - ha.x, a.y - ha.y) / 160);
     const tilt = s === hovered ? 0 : s.tilt * detail, sc = s.sc ?? 1, rot = s.rot ?? tilt;
     s.sc = sc + (target - sc) * EASE; s.rot = rot + (tilt - rot) * EASE;
@@ -143,7 +185,10 @@ function jostle(map, stickers, o) {
   for (const b of live) {
     const s = b.s, el = s.el;
     moving = Math.max(moving, Math.hypot(s.p.x - s.prev.x, s.p.y - s.prev.y));
-    el.style.width = b.w + "px"; el.style.height = b.h + "px"; el.style.visibility = "visible";
+    const w = b.w.toFixed(2) + "px", h = b.h.toFixed(2) + "px";
+    if (el.style.width !== w) el.style.width = w;
+    if (el.style.height !== h) el.style.height = h;
+    el.style.visibility = "visible";
     el.style.transform = `translate(${s.p.x - b.w / 2}px,${s.p.y - b.h / 2}px) rotate(${s.rot}deg)`;
     const lift = s === hovered ? 1 : detail;
     el.style.boxShadow = `0 ${1 + lift * 2}px ${3 + lift * 7}px rgba(0,0,0,${.12 + lift * .12})`;
@@ -153,6 +198,6 @@ function jostle(map, stickers, o) {
     if (Math.hypot(b.a.x - s.p.x, b.a.y - s.p.y) > Math.min(b.w, b.h) * .55)
       svg += `<path d="M${s.p.x},${s.p.y} L${b.a.x},${b.a.y}"/><circle cx="${b.a.x}" cy="${b.a.y}" r="3.5"/>`;
   }
-  o.ties.innerHTML = svg;
+  if (o.ties._paths !== svg) { o.ties.innerHTML = svg; o.ties._paths = svg; }
   return moving > .15 || easing > .002;
 }
