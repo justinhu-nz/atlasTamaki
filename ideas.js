@@ -764,6 +764,25 @@ window.ATLAS = {
           "credit": ""
         }
       ]
+    },
+    {
+      "slug": "te-hono",
+      "title": "Te Hono",
+      "category": "streets",
+      "description": "",
+      "images": [
+        {
+          "file": "images/upload-94180d59e20024809b7e2d9b4bb21b7c4a657097.png",
+          "center": [
+            174.698166,
+            -36.899359
+          ],
+          "wm": 338,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        }
+      ]
     }
   ]
 };
