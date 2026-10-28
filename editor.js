@@ -1,7 +1,6 @@
 const $ = id => document.getElementById(id);
 const DATA = window.ATLAS, CATS = DATA.categories, IDEAS = DATA.ideas;
 const EL = new Map();                  // picture -> its element on the map
-const pendingFiles = new Map();        // "images/name" -> File not yet saved (only when there's no save server)
 let cur = null, curImg = null, dirty = false, server = false, draw = null, keySeq = 0, listQuery = "";
 // Every idea gets a private key that survives undo. Existing ideas keep their web address when retitled, so shared links don't break.
 IDEAS.forEach(i => {
@@ -677,7 +676,7 @@ addEventListener("paste", e => {
   const files = images.map((file, i) => {
     const extension = file.name.match(/\.[a-z0-9]+$/i)?.[0]
       || ({ "image/jpeg": ".jpg", "image/webp": ".webp", "image/gif": ".gif", "image/avif": ".avif" }[file.type] || ".png");
-    // Distinct names also prevent repeated clipboard screenshots replacing pending downloads.
+    // Give each pasted screenshot a distinct upload name.
     return new File([file], `pasted-image-${batch}-${i + 1}${extension}`, { type: file.type });
   });
   addFiles(files).catch(error => status(`Couldn't paste picture: ${esc(error.message)}`, true));
@@ -690,14 +689,20 @@ $("file").onchange = e => {
   e.target.value = ""; replaceTarget = null;
 };
 async function storeFile(f) {
+  await serverReady;
   if (server) {
     const r = await fetch("images/" + encodeURIComponent(f.name), { method: "PUT", body: f });
     if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.statusText);
     return (await r.json()).path;
   }
-  const path = "images/" + f.name.replace(/[^\w.-]+/g, "-");
-  pendingFiles.set(path, f);
-  return path;
+  // Static hosting cannot write image files. Keep the bytes in the exported data
+  // so saving ideas.js alone is sufficient, including after the tab is closed.
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error("Couldn't read picture"));
+    reader.readAsDataURL(f);
+  });
 }
 async function addFiles(files, at) {
   const images = [...files].filter(f => f.type.startsWith("image/"));
@@ -802,6 +807,7 @@ window.ATLAS = ${json};
 `;
 }
 async function save() {
+  await serverReady;
   // Ideas with no picture can't appear on the map; say so, but still save.
   const hidden = IDEAS.filter(i => !i.images.length).map(label);
   const note = hidden.length ? ` ${hidden.length === 1 ? `“${esc(hidden[0])}” has` : hidden.length + " ideas have"} no picture yet, so won't show on the map.` : "";
@@ -815,14 +821,10 @@ async function save() {
     } catch (err) { status("Couldn't save: " + esc(err.message) + ". Is server.py still running?", true); }
     return;
   }
-  // No save server: download ideas.js, plus any new pictures that need to go in images/.
+  // New pictures are embedded, so the export needs only one download.
   download(new Blob([text], { type: "text/javascript" }), "ideas.js");
-  const used = new Set(IDEAS.flatMap(i => i.images.map(m => m.file)));
-  let n = 0;
-  for (const [path, f] of pendingFiles) if (used.has(path)) { download(f, path.split("/").pop()); n++; }
-  pendingFiles.clear();
   dirty = false; renderSave();
-  status(`Downloaded ideas.js${n ? ` and ${n} picture${n > 1 ? "s" : ""}` : ""}. Move ideas.js into the project folder${n ? " and the pictures into images/" : ""}.${note}`, true);
+  status(`Downloaded ideas.js with new pictures included. Move it into the project folder.${note}`, true);
 }
 function download(blob, name) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); }
 function status(html, warn = false) { $("saveInfo").innerHTML = html; $("saveInfo").classList.toggle("warn", warn); }
@@ -837,7 +839,7 @@ function renderSave() {
 addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
 
 // ---------- start ----------
-fetch("__editor").then(r => r.ok && r.json()).then(j => { server = !!j?.ok; }).catch(() => {}).finally(() => { $("serverNote").hidden = server; });
+const serverReady = fetch("__editor").then(r => r.ok && r.json()).then(j => { server = !!j?.ok; }).catch(() => {}).finally(() => { $("serverNote").hidden = server; });
 renderSave(); status("Everything is saved");
 loadImages(IDEAS, CATS).then(() => {
   for (const idea of IDEAS) for (const img of idea.images) addEl(idea, img);

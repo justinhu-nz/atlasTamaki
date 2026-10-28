@@ -613,7 +613,7 @@ window.ATLAS = {
       "description": "",
       "images": [
         {
-          "file": "images/pasted-image-6afa3c51-1.png",
+          "file": "images/newmarket-concourse.jpg",
           "center": [174.779252, -36.868264],
           "wm": 423,
           "rot": 0,

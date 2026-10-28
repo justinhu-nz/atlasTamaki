@@ -54,6 +54,33 @@ const { chromium } = require('playwright');
     assert.equal(uploads.length,3);
     assert.ok(uploads.every(upload=>upload.bytes>0));
     assert.deepEqual(errors,[]);
-    console.log('PASS: clipboard images create/add to ideas, multiple images, item fallback, unique names, image dimensions, upload flow, undo, ordinary text paste');
+    // Static hosting must export the image bytes, not a dangling images/ path.
+    await page.route('**/__editor', route => route.fulfill({status:404,body:''}));
+    await page.reload();
+    await page.waitForFunction(()=>STICKERS.length>0 && !!document.querySelector('#ideaList'));
+    await page.evaluate(()=>serverReady);
+    assert.equal(await page.evaluate(()=>server),false);
+    assert.equal(await paste(),true);
+    await page.waitForFunction(()=>cur?.images.length===1 && !!document.querySelector('.imgcard'));
+    assert.match(await page.evaluate(()=>curImg.file),/^data:image\/png;base64,/);
+    const exported=await page.evaluate(()=>ideasJs());
+    const downloads=[];
+    page.on('download',download=>downloads.push(download.suggestedFilename()));
+    const downloaded=page.waitForEvent('download');
+    await page.evaluate(()=>save());
+    await downloaded;
+    assert.deepEqual(downloads,['ideas.js']);
+    // Load the exported data into a fresh document: the clipboard blob URL is gone.
+    await page.route('**/ideas.js',route=>route.fulfill({contentType:'text/javascript',body:exported}));
+    await page.reload();
+    await page.waitForFunction(()=>STICKERS.some(s=>s.img.file?.startsWith('data:image/')));
+    const restored=await page.evaluate(async()=>{
+      const img=IDEAS.flatMap(i=>i.images).find(im=>im.file?.startsWith('data:image/'));
+      const picture=new Image();picture.src=img.file;await picture.decode();
+      return {width:picture.naturalWidth,height:picture.naturalHeight};
+    });
+    assert.deepEqual(restored,{width:20,height:10});
+    assert.deepEqual(errors,[]);
+    console.log('PASS: clipboard upload, multiple images, item fallback, undo, text paste, single-file static export and image reload');
   } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -10,6 +10,8 @@ python3 server.py
 
 Open `http://localhost:8765/` or `http://localhost:8765/editor.html`. The local server lets the editor save files; GitHub Pages uses the editor's existing download/export flow.
 
+Pasted and uploaded pictures save automatically through the local server. On static hosting, new pictures are embedded in the downloaded `ideas.js`, so only that file needs moving into the project; no separate image downloads are needed. Embedded pictures increase the size of `ideas.js` and use their original resolution.
+
 ## Images and publishing
 
 Display images and their dimensions are checked in, so publishing the repository root works as before. After adding or replacing images with the editor, regenerate the optimized assets before publishing:
