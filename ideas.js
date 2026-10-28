@@ -783,6 +783,25 @@ window.ATLAS = {
           "credit": ""
         }
       ]
+    },
+    {
+      "slug": "dom-rd-junction-removal-lrt",
+      "title": "Dom Rd junction removal / LRT",
+      "category": "streets",
+      "description": "",
+      "images": [
+        {
+          "file": "images/upload-27bceafa6c26c7c5ef89770d41ff31d7a4a37915.png",
+          "center": [
+            174.753293,
+            -36.868343
+          ],
+          "wm": 241,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        }
+      ]
     }
   ]
 };
