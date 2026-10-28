@@ -1,13 +1,4 @@
-// Atlas Tāmaki data, written by editor.html. Loaded as a script (not fetched) so index.html also works from disk.
-//
-// Each idea has a title, a category, a description and optionally sources.
-// Each idea has one or more images. Every image becomes a sticker on the map.
-//   file     path in images/ or a URL. If missing, a stand-in is drawn.
-//   kind     stand-ins only: "drawing" draws a plan-style stand-in, anything else a photo-style one
-//   center   [lng, lat] where the image belongs
-//   wm       width in metres when laid on the map at true scale
-//   hm       height in metres (stand-ins only; real images use their own aspect ratio)
-//   rot      rotation in degrees, clockwise (true scale only)
+// Atlas Tāmaki data, saved by the online editor.
 window.ATLAS = {
   "categories": {
     "rapid": {
@@ -45,7 +36,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/felt-01-rosedale-2.jpeg",
-          "center": [174.719795, -36.738566],
+          "center": [
+            174.719795,
+            -36.738566
+          ],
           "wm": 2391,
           "rot": 0,
           "caption": "Artist’s impression of Rosedale busway station",
@@ -61,7 +55,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/542a4493-b6f1-4795-bf9f-2ef925234126.png",
-          "center": [174.854828, -36.879498],
+          "center": [
+            174.854828,
+            -36.879498
+          ],
           "wm": 1567,
           "rot": 0,
           "caption": "Glen Innes station interchange concept",
@@ -77,7 +74,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/2c522733-c719-4908-9b52-97bd10f355e1.png",
-          "center": [174.904849, -36.915812],
+          "center": [
+            174.904849,
+            -36.915812
+          ],
           "wm": 2668,
           "rot": -7,
           "caption": "East Auckland bus network and green bridge connection",
@@ -100,7 +100,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/d4cb9028-059c-4f84-b977-efcaa6484879.png",
-          "center": [174.8413, -36.91783],
+          "center": [
+            174.8413,
+            -36.91783
+          ],
           "wm": 1047,
           "rot": 78.8,
           "caption": "Sylvia Park bus connection plan",
@@ -116,7 +119,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/cd2b1115-f559-44fe-bf26-6f946733d73a.png",
-          "center": [174.810979, -36.86403],
+          "center": [
+            174.810979,
+            -36.86403
+          ],
           "wm": 1426,
           "rot": 0,
           "caption": "Ōrākei waterfront development concept",
@@ -132,7 +138,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/7dcfd5c8-1959-4a8f-82bb-09c9b797ed87.png",
-          "center": [174.851134, -36.898978],
+          "center": [
+            174.851134,
+            -36.898978
+          ],
           "wm": 259,
           "rot": 0,
           "caption": "Panmure junction redesign",
@@ -148,7 +157,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/389657a7-1701-4117-aab3-dd4ed7ba0d7b.png",
-          "center": [174.799531, -36.888215],
+          "center": [
+            174.799531,
+            -36.888215
+          ],
           "wm": 501,
           "rot": 0,
           "caption": "Greenlane station access concept",
@@ -164,7 +176,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/c418f851-31c8-4b6b-8ffd-873cd5b53f63.png",
-          "center": [174.780313, -36.853932],
+          "center": [
+            174.780313,
+            -36.853932
+          ],
           "wm": 1513,
           "rot": 0,
           "caption": "Parnell station and bus interchange sketch",
@@ -180,7 +195,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/bd4e531c-44b4-4a95-ada6-43bb09fb9195.png",
-          "center": [174.838231, -36.913451],
+          "center": [
+            174.838231,
+            -36.913451
+          ],
           "wm": 868,
           "rot": 0,
           "caption": "Sylvia Park station upgrade concept",
@@ -196,7 +214,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/414049c8-201f-4193-a7e8-6f5c99571f01.png",
-          "center": [174.855243, -36.988438],
+          "center": [
+            174.855243,
+            -36.988438
+          ],
           "wm": 938,
           "rot": 0,
           "caption": "Puhinui interchange and electric buses",
@@ -226,7 +247,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/b3cfe633-1160-4a69-b897-187fe48cfdb6.png",
-          "center": [174.878741, -36.993585],
+          "center": [
+            174.878741,
+            -36.993585
+          ],
           "wm": 414,
           "rot": 0,
           "caption": "Manukau station precinct concept",
@@ -234,7 +258,10 @@ window.ATLAS = {
         },
         {
           "file": "images/05e98e73-e130-4df8-a4f6-910c651e97d5.png",
-          "center": [174.877698, -36.991265],
+          "center": [
+            174.877698,
+            -36.991265
+          ],
           "wm": 640,
           "rot": 0,
           "caption": "Manukau interchange entrance concept",
@@ -250,7 +277,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/59f3e533-aad9-429a-8891-6e1fa9299cf2.png",
-          "center": [174.694017, -36.8314],
+          "center": [
+            174.694017,
+            -36.8314
+          ],
           "wm": 12217,
           "rot": 0,
           "caption": "",
@@ -273,7 +303,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/510665d8-1c0a-4642-a3fe-ffeca20df002.png",
-          "center": [174.746908, -36.886616],
+          "center": [
+            174.746908,
+            -36.886616
+          ],
           "wm": 1009,
           "rot": 0,
           "caption": "",
@@ -281,7 +314,10 @@ window.ATLAS = {
         },
         {
           "file": "images/8a9979c4-d4b6-4165-b0b5-fe74f95ed68e.png",
-          "center": [174.749699, -36.887017],
+          "center": [
+            174.749699,
+            -36.887017
+          ],
           "wm": 1185,
           "rot": 0,
           "caption": "",
@@ -297,8 +333,11 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/8dcd1fb0-8599-4841-a9a9-e6313883b7cb.png",
-          "center": [174.827519, -36.92796],
-          "wm": 1057,
+          "center": [
+            174.829129,
+            -36.93178
+          ],
+          "wm": 1089,
           "rot": -97.1,
           "caption": "Westfield Junction grade separation",
           "credit": "Original creator not stated."
@@ -313,7 +352,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/6f3f2b6c-3f14-49ed-8d0c-008279463745.png",
-          "center": [174.73665, -36.761135],
+          "center": [
+            174.73665,
+            -36.761135
+          ],
           "wm": 1417,
           "rot": 0,
           "caption": "Sunnynook busway station upgrade",
@@ -329,7 +371,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/2926c09c-d35a-4817-bf24-b88c4c3a6ad2.png",
-          "center": [174.706661, -36.87489],
+          "center": [
+            174.706661,
+            -36.87489
+          ],
           "wm": 1265,
           "rot": -2.2,
           "caption": "Waterview green bridge connection",
@@ -345,7 +390,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/6adb0f42-19ed-46ea-bccb-07ed4ae3911a.png",
-          "center": [174.743302, -36.775579],
+          "center": [
+            174.743302,
+            -36.775579
+          ],
           "wm": 1038,
           "rot": -109.9,
           "caption": "Wairau Valley busway station",
@@ -361,7 +409,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/1df980cd-8420-49ad-a349-9da2624a3adc.png",
-          "center": [174.735813, -36.874499],
+          "center": [
+            174.735813,
+            -36.874499
+          ],
           "wm": 316,
           "rot": 0,
           "caption": "",
@@ -384,7 +435,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/5df7e72a-0d87-460c-8b75-6858d24f489b.png",
-          "center": [174.749866, -36.816286],
+          "center": [
+            174.749866,
+            -36.816286
+          ],
           "wm": 2386,
           "rot": 0,
           "caption": "",
@@ -407,7 +461,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/ad92c9b2-7401-495b-a84e-7254ce26c9d5.png",
-          "center": [174.763952, -36.8472],
+          "center": [
+            174.763952,
+            -36.8472
+          ],
           "wm": 1494,
           "rot": 0,
           "caption": "Queen Street LRT",
@@ -415,7 +472,10 @@ window.ATLAS = {
         },
         {
           "file": "images/3b0bb232-0cb7-4d02-95af-5129e8933bbf.png",
-          "center": [174.752418, -36.875677],
+          "center": [
+            174.752418,
+            -36.875677
+          ],
           "wm": 1247,
           "rot": 0,
           "caption": "Dominion Road light rail corridor",
@@ -423,7 +483,10 @@ window.ATLAS = {
         },
         {
           "file": "images/ccb46413-dd99-45bb-8b3f-69de0f68de44.png",
-          "center": [174.746874, -36.890044],
+          "center": [
+            174.746874,
+            -36.890044
+          ],
           "wm": 1735,
           "rot": 0,
           "caption": "Dominion Road light rail streetscape",
@@ -431,7 +494,10 @@ window.ATLAS = {
         },
         {
           "file": "images/ef4655dc-ce4c-4720-82b3-ead244795adb.png",
-          "center": [174.761511, -36.85787],
+          "center": [
+            174.761511,
+            -36.85787
+          ],
           "wm": 1319,
           "rot": 0,
           "caption": "Karangahape station platform concept",
@@ -454,7 +520,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/07bf964e-5f02-4347-8d56-eaebffc4dea8.png",
-          "center": [174.771651, -36.843648],
+          "center": [
+            174.771651,
+            -36.843648
+          ],
           "wm": 1461,
           "rot": 0,
           "caption": "",
@@ -462,7 +531,10 @@ window.ATLAS = {
         },
         {
           "file": "images/9553d24c-bf8f-4bf5-938a-b60cb5463bac.png",
-          "center": [174.773089, -36.845074],
+          "center": [
+            174.773089,
+            -36.845074
+          ],
           "wm": 1531,
           "rot": 0,
           "caption": "",
@@ -478,7 +550,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/UI2MOMODTQ4HI33AKWV6SA5GV4-2.avif",
-          "center": [174.733689, -36.882573],
+          "center": [
+            174.733689,
+            -36.882573
+          ],
           "wm": 4558,
           "rot": 0,
           "caption": "",
@@ -494,7 +569,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/CleanShot-2026-10-26-at-21.06.03-2x.png",
-          "center": [174.925345, -37.044385],
+          "center": [
+            174.925345,
+            -37.044385
+          ],
           "wm": 9814,
           "rot": -1.5,
           "caption": "",
@@ -510,7 +588,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/CleanShot-2026-10-26-at-21.20.34-2x-2.png",
-          "center": [174.833233, -36.866131],
+          "center": [
+            174.833233,
+            -36.866131
+          ],
           "wm": 135,
           "rot": -83.6,
           "caption": "",
@@ -526,7 +607,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/northcote-town-square-render2-2.jpg",
-          "center": [174.745689, -36.799557],
+          "center": [
+            174.745689,
+            -36.799557
+          ],
           "wm": 6491,
           "rot": 0,
           "caption": "",
@@ -542,7 +626,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/Greenlane-West-Option-1-Layout.jpg",
-          "center": [174.779796, -36.891839],
+          "center": [
+            174.779796,
+            -36.891839
+          ],
           "wm": 3036,
           "rot": -0.83,
           "caption": "",
@@ -558,7 +645,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/CleanShot-2026-10-27-at-15.16.32-2x-2.png",
-          "center": [174.788208, -36.939527],
+          "center": [
+            174.788208,
+            -36.939527
+          ],
           "wm": 13973,
           "rot": -0.829,
           "caption": "",
@@ -574,7 +664,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/images-2.jpg",
-          "center": [174.790216, -36.972467],
+          "center": [
+            174.790216,
+            -36.972467
+          ],
           "wm": 9273,
           "rot": 0,
           "caption": "",
@@ -590,7 +683,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/OLYMPUS-DIGITAL-CAMERA-2.jpg",
-          "center": [174.846364, -36.914354],
+          "center": [
+            174.846364,
+            -36.914354
+          ],
           "wm": 2096,
           "rot": 0,
           "caption": "",
@@ -598,7 +694,10 @@ window.ATLAS = {
         },
         {
           "file": "images/Sylvia-Park-2.jpg",
-          "center": [174.845668, -36.913672],
+          "center": [
+            174.845668,
+            -36.913672
+          ],
           "wm": 2096,
           "rot": 0,
           "caption": "",
@@ -614,7 +713,10 @@ window.ATLAS = {
       "images": [
         {
           "file": "images/newmarket-concourse.jpg",
-          "center": [174.779252, -36.868264],
+          "center": [
+            174.779252,
+            -36.868264
+          ],
           "wm": 423,
           "rot": 0,
           "caption": "",
@@ -622,8 +724,41 @@ window.ATLAS = {
         },
         {
           "file": "images/CleanShot-2026-10-28-at-00.34.21-2x.png",
-          "center": [174.778794, -36.868073],
+          "center": [
+            174.778794,
+            -36.868073
+          ],
           "wm": 1417,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        }
+      ]
+    },
+    {
+      "slug": "sylvia-park-masterplan",
+      "title": "Sylvia Park masterplan",
+      "category": "housing",
+      "description": "",
+      "images": [
+        {
+          "file": "images/upload-dba248b9050257aeb9dc12a73fb5844112a06476.png",
+          "center": [
+            174.841504,
+            -36.913463
+          ],
+          "wm": 1151,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        },
+        {
+          "file": "images/upload-e37c7315978820ae29a1e10f32e1fe5b8fc15781.jpg",
+          "center": [
+            174.84161,
+            -36.913488
+          ],
+          "wm": 1151,
           "rot": 0,
           "caption": "",
           "credit": ""
