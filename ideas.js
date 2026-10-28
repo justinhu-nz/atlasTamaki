@@ -462,8 +462,8 @@ window.ATLAS = {
         {
           "file": "images/ad92c9b2-7401-495b-a84e-7254ce26c9d5.png",
           "center": [
-            174.763952,
-            -36.8472
+            174.765649,
+            -36.847606
           ],
           "wm": 1494,
           "rot": 0,
@@ -502,6 +502,50 @@ window.ATLAS = {
           "rot": 0,
           "caption": "Karangahape station platform concept",
           "credit": "Original creator not stated."
+        },
+        {
+          "file": "images/upload-b34887d07e92fc34fd776b6e96f4b27076c8d66a.png",
+          "center": [
+            174.7661,
+            -36.846346
+          ],
+          "wm": 432,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        },
+        {
+          "file": "images/upload-8dc145d9a03fd78106086cd13addeb773dfe3520.png",
+          "center": [
+            174.747263,
+            -36.888254
+          ],
+          "wm": 99,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        },
+        {
+          "file": "images/upload-607844fd0799b592b5c811ec017b23324310f9ae.png",
+          "center": [
+            174.754776,
+            -36.843667
+          ],
+          "wm": 232,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        },
+        {
+          "file": "images/upload-298704ae9df6cb9b9b36d9fb5e3902f97878a9d6.png",
+          "center": [
+            174.763558,
+            -36.85307
+          ],
+          "wm": 425,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
         }
       ]
     },
@@ -797,6 +841,82 @@ window.ATLAS = {
             -36.868343
           ],
           "wm": 241,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        }
+      ]
+    },
+    {
+      "slug": "new-city-centre-library",
+      "title": "New city centre library",
+      "category": "streets",
+      "description": "",
+      "images": [
+        {
+          "file": "images/upload-8531979bf36d9640cfdb8d508c23559ea0da5787.png",
+          "center": [
+            174.763324,
+            -36.851448
+          ],
+          "wm": 335,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        }
+      ]
+    },
+    {
+      "slug": "maungawhau-tod",
+      "title": "Maungawhau TOD",
+      "category": "housing",
+      "description": "",
+      "images": [
+        {
+          "file": "images/upload-2ce8f3c3f2c73e50eddda5e815b606d9a98a51b9.png",
+          "center": [
+            174.759347,
+            -36.867432
+          ],
+          "wm": 2572,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        }
+      ]
+    },
+    {
+      "slug": "universities-bus-interchange",
+      "title": "Universities bus interchange",
+      "category": "bus",
+      "description": "",
+      "images": [
+        {
+          "file": "images/upload-637d5682494252931c3742fdd97f676ed8d71e39.png",
+          "center": [
+            174.768185,
+            -36.854019
+          ],
+          "wm": 474,
+          "rot": 0,
+          "caption": "",
+          "credit": ""
+        }
+      ]
+    },
+    {
+      "slug": "albert-park-tunnels",
+      "title": "Albert Park Tunnels",
+      "category": "active",
+      "description": "",
+      "images": [
+        {
+          "file": "images/upload-a5c76f0ca56c676800af6b0b67366fc3641dae92.png",
+          "center": [
+            174.767294,
+            -36.849624
+          ],
+          "wm": 432,
           "rot": 0,
           "caption": "",
           "credit": ""
