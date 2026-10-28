@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = ("index.html", "editor.html", "atlas.css", "atlas.js", "viewer.js", "editor.js", "ideas.js",
-         "image-manifest.js", "basemaps.js", "transport-layers.js", "data/railways.js")
+         "image-manifest.js", "basemaps.js", "transport-layers.js", "data/railways.js", "favicon.ico")
 
 
 def build(output):
