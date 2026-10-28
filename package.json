@@ -1,0 +1,32 @@
+{
+  "name": "atlastamaki",
+  "version": "1.0.0",
+  "description": "Atlas Tāmaki static map and private GitHub-backed online editor",
+  "scripts": {
+    "test": "node --import tsx --test tests/online-worker.test.mjs",
+    "typecheck": "tsc --noEmit",
+    "cf:types": "wrangler types",
+    "build": "python3 scripts/optimize-images.py && python3 scripts/build-pages.py",
+    "cf:dev": "npm run build && wrangler dev",
+    "cf:check": "npm run build && wrangler deploy --dry-run",
+    "cf:deploy": "npm run build && wrangler deploy",
+    "cf:bootstrap": "npm run build && node scripts/bootstrap-editor.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justinhu-nz/atlasTamaki.git"
+  },
+  "type": "module",
+  "homepage": "https://github.com/justinhu-nz/atlasTamaki#readme",
+  "dependencies": {
+    "jose": "^6.2.13"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261028.1",
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.154.0"
+  },
+  "private": true
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "atlas-tamaki-editor",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-28",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "vars": {
+    "GITHUB_REPOSITORY": "justinhu-nz/atlasTamaki",
+    "GITHUB_BRANCH": "main",
+    "PUBLIC_URL": "https://justinhu-nz.github.io/atlasTamaki/",
+    "EDITOR_EMAIL": "hujustinnz@outlook.com",
+    "ACCESS_TEAM_DOMAIN": "divine-sea-790a.cloudflareaccess.com",
+    "ACCESS_AUD": "c455c68bc8c717325dc874514bdef7b57d6ebed418da410b25bbb86a6953f61f"
+  },
+  "secrets": { "required": ["GITHUB_TOKEN"] },
+  "observability": { "enabled": true }
+}

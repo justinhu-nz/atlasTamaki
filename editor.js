@@ -2,6 +2,14 @@ const $ = id => document.getElementById(id);
 const DATA = window.ATLAS, CATS = DATA.categories, IDEAS = DATA.ideas;
 const EL = new Map();                  // picture -> its element on the map
 let cur = null, curImg = null, dirty = false, server = false, draw = null, keySeq = 0, listQuery = "";
+let online = !!window.ATLAS_REVISION, publishing = false, editVersion = 0, publicationCheck = 0;
+const uploadedImages = new Map(), uploadedSources = new Map(), imageTasks = new Set();
+function trackImageTask(task) {
+  imageTasks.add(task); renderSave();
+  const finish = () => { imageTasks.delete(task); renderSave(); };
+  task.then(finish, finish);
+  return task;
+}
 // Every idea gets a private key that survives undo. Existing ideas keep their web address when retitled, so shared links don't break.
 IDEAS.forEach(i => {
   i._key = ++keySeq; i._slugEdited = true;
@@ -690,6 +698,14 @@ $("file").onchange = e => {
 };
 async function storeFile(f) {
   await serverReady;
+  if (online) {
+    const result = await onlineRequest("api/images", {
+      method: "POST", headers: { "Content-Type": f.type }, body: f
+    });
+    uploadedImages.set(result.path, result.sha);
+    uploadedSources.set(result.path, f);
+    return result.path;
+  }
   if (server) {
     const r = await fetch("images/" + encodeURIComponent(f.name), { method: "PUT", body: f });
     if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.statusText);
@@ -704,7 +720,8 @@ async function storeFile(f) {
     reader.readAsDataURL(f);
   });
 }
-async function addFiles(files, at) {
+function addFiles(files, at) { return trackImageTask(addFilesNow(files, at)); }
+async function addFilesNow(files, at) {
   const images = [...files].filter(f => f.type.startsWith("image/"));
   if (!images.length) { status("That isn't a picture file.", true); return; }
   for (const f of images) {
@@ -725,7 +742,8 @@ async function addFiles(files, at) {
   renderIdea(); render();
   document.querySelector(".imgcard.sel")?.scrollIntoView({ block: "nearest" });
 }
-async function replaceFile(img, f) {
+function replaceFile(img, f) { return trackImageTask(replaceFileNow(img, f)); }
+async function replaceFileNow(img, f) {
   let path;
   try { path = await storeFile(f); } catch (err) { status("Couldn't replace: " + esc(err.message), true); return; }
   checkpoint();
@@ -790,8 +808,8 @@ function cleanIdea(i) {
   });
   return o;
 }
-function ideasJs() {
-  const json = JSON.stringify({ categories: CATS, ideas: IDEAS.map(cleanIdea) }, null, 2)
+function ideasJs(ideas = IDEAS.map(cleanIdea)) {
+  const json = JSON.stringify({ categories: CATS, ideas }, null, 2)
     .replace(/\[\s*(-?[\d.]+),\s*(-?[\d.]+)\s*\]/g, "[$1, $2]");   // keep [lng, lat] pairs on one line
   return `// Atlas Tāmaki data, written by editor.html. Loaded as a script (not fetched) so index.html also works from disk.
 //
@@ -808,6 +826,12 @@ window.ATLAS = ${json};
 }
 async function save() {
   await serverReady;
+  if (publishing) return;
+  if (imageTasks.size) {
+    status("Wait for the pictures to finish uploading, then publish.", true);
+    return;
+  }
+  if (online) return publishOnline();
   // Ideas with no picture can't appear on the map; say so, but still save.
   const hidden = IDEAS.filter(i => !i.images.length).map(label);
   const note = hidden.length ? ` ${hidden.length === 1 ? `“${esc(hidden[0])}” has` : hidden.length + " ideas have"} no picture yet, so won't show on the map.` : "";
@@ -829,17 +853,101 @@ async function save() {
 function download(blob, name) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); }
 function status(html, warn = false) { $("saveInfo").innerHTML = html; $("saveInfo").classList.toggle("warn", warn); }
 $("saveInfo").addEventListener("click", e => { if (e.target.closest("[data-undo]")) undo(); });
-function markDirty() { dirty = true; renderSave(); if (!cur && $("ideaList")) renderIdeaList(); }
+function markDirty() { dirty = true; editVersion++; renderSave(); if (!cur && $("ideaList")) renderIdeaList(); }
 function renderSave() {
   $("save").classList.toggle("dirty", dirty);
-  $("save").textContent = dirty ? "Save changes" : "✓ Saved";
-  $("save").disabled = !dirty;
-  if (dirty && !/Removed|Deleted|Added/.test($("saveInfo").textContent)) status("Unsaved changes");
+  $("save").textContent = publishing ? "Publishing…" : imageTasks.size ? "Uploading…"
+    : dirty ? (online ? "Publish changes" : "Save changes") : "✓ Saved";
+  $("save").disabled = !dirty || publishing || !!imageTasks.size;
+  if (dirty && !publishing && !imageTasks.size && !/Removed|Deleted|Added/.test($("saveInfo").textContent)) status("Unsaved changes");
 }
-addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+addEventListener("beforeunload", e => { if (dirty || imageTasks.size || publishing) { e.preventDefault(); e.returnValue = ""; } });
+
+async function onlineRequest(path, options = {}) {
+  let response;
+  try {
+    response = await fetch(path, {
+      ...options, headers: { ...options.headers, "X-Atlas-Editor": "1" }, redirect: "error"
+    });
+  } catch {
+    throw new Error("Connection or sign-in interrupted. Your edits are still here. Export a backup before reloading.");
+  }
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || "Couldn't save. Your edits are still here.");
+  return result;
+}
+async function publishOnline() {
+  publishing = true; renderSave(); status("Saving your changes and pictures…");
+  const version = editVersion;
+  try {
+    const data = { categories: CATS, ideas: IDEAS.map(cleanIdea) };
+    const used = new Set(data.ideas.flatMap(i => i.images.map(im => im.file)));
+    const uploads = [...uploadedImages].filter(([path]) => used.has(path)).map(([path, sha]) => ({ path, sha }));
+    const result = await onlineRequest("api/publish", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ base: window.ATLAS_REVISION, data, uploads })
+    });
+    window.ATLAS_REVISION = result.commit;
+    if (editVersion === version) dirty = false;
+    status("Saved. Publishing the public map…");
+    const check = ++publicationCheck;
+    void watchPublication(result.commit, check);
+  } catch (error) {
+    status(`${esc(error.message)} <button data-backup>Export backup</button>`, true);
+  } finally {
+    publishing = false;
+    // Update the button without replacing the useful success/error message.
+    const message = $("saveInfo").innerHTML, warn = $("saveInfo").classList.contains("warn");
+    renderSave(); status(message, warn);
+  }
+}
+async function watchPublication(commit, check) {
+  for (let attempt = 0; attempt < 60; attempt++) {
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    if (check !== publicationCheck) return;
+    try {
+      const result = await onlineRequest(`api/publish-status?commit=${encodeURIComponent(commit)}`);
+      if (check !== publicationCheck) return;
+      if (result.state === "live") {
+        status(dirty ? "Your previous publish is live. You have more unsaved changes." : "Published. Your map is live.");
+        return;
+      }
+      if (result.state === "failed") {
+        status(`Saved to GitHub, but publishing failed. <a href="${esc(result.url)}" target="_blank" rel="noopener">Check publishing</a>.`, true);
+        return;
+      }
+    } catch {
+      status("Saved to GitHub. Couldn't check publication; your saved changes are safe.", true);
+      return;
+    }
+  }
+  if (check === publicationCheck) status("Saved to GitHub. Publishing is taking longer than usual.", true);
+}
+$("saveInfo").addEventListener("click", e => {
+  if (e.target.closest("[data-backup]")) exportBackup().catch(error => status(`Couldn't export backup: ${esc(error.message)}`, true));
+});
+async function exportBackup() {
+  const ideas = IDEAS.map(cleanIdea);
+  for (const image of ideas.flatMap(i => i.images)) {
+    const source = uploadedSources.get(image.file);
+    if (source) image.file = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(source);
+    });
+  }
+  download(new Blob([ideasJs(ideas)], { type: "text/javascript" }), "ideas-backup.js");
+}
 
 // ---------- start ----------
-const serverReady = fetch("__editor").then(r => r.ok && r.json()).then(j => { server = !!j?.ok; }).catch(() => {}).finally(() => { $("serverNote").hidden = server; });
+const serverReady = fetch("__editor").then(r => r.ok && r.json()).then(j => {
+  server = !!j?.ok; online = online || j?.mode === "github";
+  if (online) {
+    $("viewLink").href = j.publicURL;
+    $("save").title = "Publish changes (⌘S / Ctrl+S)";
+  }
+}).catch(() => {}).finally(() => { $("serverNote").hidden = server; renderSave(); });
 renderSave(); status("Everything is saved");
 loadImages(IDEAS, CATS).then(() => {
   for (const idea of IDEAS) for (const img of idea.images) addEl(idea, img);

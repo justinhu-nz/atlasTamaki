@@ -1,5 +1,8 @@
 # Atlas Tāmaki
 
+For the private online editor with email login and GitHub-backed publishing,
+see [ONLINE-EDITOR.md](ONLINE-EDITOR.md).
+
 A static map and editor for Auckland transport, streets and housing ideas. The site runs directly from GitHub Pages, including project URLs such as `/atlasTamaki/`. It needs no application server, bundler or client framework.
 
 ## Run locally
