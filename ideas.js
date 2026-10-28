@@ -75,11 +75,11 @@ window.ATLAS = {
         {
           "file": "images/2c522733-c719-4908-9b52-97bd10f355e1.png",
           "center": [
-            174.904849,
-            -36.915812
+            174.919275,
+            -36.920034
           ],
-          "wm": 2668,
-          "rot": -7,
+          "wm": 10677,
+          "rot": 0,
           "caption": "East Auckland bus network and green bridge connection",
           "credit": "Original creator not stated."
         }
@@ -278,10 +278,10 @@ window.ATLAS = {
         {
           "file": "images/59f3e533-aad9-429a-8891-6e1fa9299cf2.png",
           "center": [
-            174.694017,
-            -36.8314
+            174.688866,
+            -36.830618
           ],
-          "wm": 12217,
+          "wm": 12173,
           "rot": 0,
           "caption": "",
           "credit": "Original creator not stated."
@@ -646,8 +646,8 @@ window.ATLAS = {
         {
           "file": "images/CleanShot-2026-10-27-at-15.16.32-2x-2.png",
           "center": [
-            174.788208,
-            -36.939527
+            174.76359,
+            -36.921469
           ],
           "wm": 13973,
           "rot": -0.829,
@@ -725,11 +725,11 @@ window.ATLAS = {
         {
           "file": "images/CleanShot-2026-10-28-at-00.34.21-2x.png",
           "center": [
-            174.778794,
-            -36.868073
+            174.779227,
+            -36.868457
           ],
-          "wm": 1417,
-          "rot": 0,
+          "wm": 131,
+          "rot": -78.18,
           "caption": "",
           "credit": ""
         }
